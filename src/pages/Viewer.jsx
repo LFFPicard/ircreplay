@@ -3,6 +3,7 @@ import DropZone from '../components/DropZone'
 import ChatPane from '../components/ChatPane'
 import { useSession } from '../context/SessionContext'
 import ParseWorker from '../workers/parseWorker.js?worker'
+import { loadSession } from '../lib/exportSession'
 
 function Viewer() {
   const { session, setSession } = useSession()
@@ -26,6 +27,16 @@ function Viewer() {
     setPhase('reading')
   }, [])
 
+  const handleSessionLoaded = useCallback((jsonText) => {
+    try {
+      const restored = loadSession(jsonText)
+      setMode('instant')
+      setSession(restored)
+    } catch (err) {
+      console.error('Failed to load session:', err)
+    }
+  }, [setSession])  
+  
   const handleFilesLoaded = useCallback((files, selectedMode) => {
     setPhase('parsing')
     workerRef.current?.terminate()
@@ -102,8 +113,12 @@ function Viewer() {
   }
 
   if (!session) {
-    return (
-      <DropZone onFilesLoaded={handleFilesLoaded} onFilesStart={handleFilesStart} />
+  return (
+      <DropZone
+        onFilesLoaded={handleFilesLoaded}
+        onFilesStart={handleFilesStart}
+        onSessionLoaded={handleSessionLoaded}
+      />
     )
   }
 

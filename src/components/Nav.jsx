@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useSession } from '../context/SessionContext'
 import { generateStatsHtml, downloadFile } from '../lib/exportHtml'
-import { useState } from 'react'
+import { saveSession } from '../lib/exportSession'
 
 const THEMES = [
   { id: 'light',   label: '☀️ Light'   },
@@ -11,15 +12,15 @@ const THEMES = [
 ]
 
 function Nav() {
-  const { theme, setTheme }   = useTheme()
-  const { session, stats }    = useSession()
+  const { theme, setTheme } = useTheme()
+  const { session, stats  } = useSession()
   const [exportMode, setExportMode] = useState('html')
 
   const canExport = session && stats
+  const canSave   = !!session
 
   const handleExport = () => {
     if (!canExport) return
-
     const channel  = (session.channel || 'channel').replace(/[^a-zA-Z0-9_-]/g, '')
     const datePart = session.date
       ? session.date.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 15)
@@ -29,15 +30,17 @@ function Nav() {
       const html = generateStatsHtml(session, stats)
       downloadFile(`${channel}-${datePart}-ircreplay.html`, html, 'text/html')
     } else {
-      // PDF via browser print dialog
       const html     = generateStatsHtml(session, stats)
       const printWin = window.open('', '_blank')
       printWin.document.write(html)
       printWin.document.close()
-      printWin.onload = () => {
-        printWin.print()
-      }
+      printWin.onload = () => { printWin.print() }
     }
+  }
+
+  const handleSave = () => {
+    if (!canSave) return
+    saveSession(session)
   }
 
   return (
@@ -56,10 +59,20 @@ function Nav() {
 
       <div className="ml-auto flex items-center gap-3">
 
-        {/* Export controls — only when session + stats are ready */}
+        {/* Save session button */}
+        {canSave && (
+          <button
+            onClick={handleSave}
+            title="Save session as JSON — reload later without re-uploading logs"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          >
+            💾 Save Session
+          </button>
+        )}
+
+        {/* Export controls */}
         {canExport && (
           <div className="flex items-center gap-1">
-            {/* Format toggle */}
             <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
               {['html', 'pdf'].map(m => (
                 <button
@@ -75,7 +88,6 @@ function Nav() {
                 </button>
               ))}
             </div>
-            {/* Export button */}
             <button
               onClick={handleExport}
               className="flex items-center gap-1.5 bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
