@@ -1,1 +1,114 @@
 @import "tailwindcss";
+
+/* ── FIXEDSYS FONT ───────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Fixedsys Excelsior';
+  src: url('https://cdn.jsdelivr.net/gh/kika/fixedsys@master/font/FSEX300.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── BASE THEME BACKGROUNDS ─────────────────────────────────────── */
+.theme-dark {
+  background-color: #030712;
+}
+
+.theme-light {
+  background-color: #f3f4f6;
+}
+
+.theme-classic {
+  background-color: #c0c0c0;
+}
+
+/* ── LIGHT THEME OVERRIDES ──────────────────────────────────────── */
+.theme-light {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Backgrounds */
+.theme-light .bg-gray-950 { background-color: #ffffff !important; }
+.theme-light .bg-gray-900 { background-color: #f9fafb !important; }
+.theme-light .bg-gray-800 { background-color: #f3f4f6 !important; }
+.theme-light .bg-gray-700 { background-color: #e5e7eb !important; }
+
+/* Text */
+.theme-light .text-gray-200 { color: #1f2937 !important; }
+.theme-light .text-gray-300 { color: #374151 !important; }
+.theme-light .text-gray-400 { color: #4b5563 !important; }
+.theme-light .text-gray-500 { color: #6b7280 !important; }
+.theme-light .text-gray-600 { color: #9ca3af !important; }
+.theme-light .text-gray-700 { color: #d1d5db !important; }
+.theme-light .text-white    { color: #111827 !important; }
+
+/* Borders */
+.theme-light .border-gray-700 { border-color: #d1d5db !important; }
+.theme-light .border-gray-800 { border-color: #e5e7eb !important; }
+.theme-light .border-gray-600 { border-color: #d1d5db !important; }
+
+/* Hover */
+.theme-light .hover\:bg-white\/5:hover  { background-color: rgba(0,0,0,0.05) !important; }
+.theme-light .hover\:bg-gray-700\/50:hover { background-color: rgba(0,0,0,0.07) !important; }
+
+/* Input / form elements */
+.theme-light .bg-gray-900.border { background-color: #ffffff !important; }
+
+/* ── CLASSIC THEME OVERRIDES ────────────────────────────────────── */
+.theme-classic {
+  background-color: #c0c0c0;
+  color: #000000;
+}
+
+.theme-classic * {
+  font-family: 'Fixedsys Excelsior', 'Courier New', monospace !important;
+}
+
+/* Backgrounds */
+.theme-classic .bg-gray-950 { background-color: #ffffff !important; }
+.theme-classic .bg-gray-900 { background-color: #c0c0c0 !important; }
+.theme-classic .bg-gray-800 { background-color: #c0c0c0 !important; }
+.theme-classic .bg-gray-700 { background-color: #808080 !important; }
+
+/* Text */
+.theme-classic .text-gray-200 { color: #000000 !important; }
+.theme-classic .text-gray-300 { color: #000000 !important; }
+.theme-classic .text-gray-400 { color: #444444 !important; }
+.theme-classic .text-gray-500 { color: #808080 !important; }
+.theme-classic .text-gray-600 { color: #808080 !important; }
+.theme-classic .text-white    { color: #000000 !important; }
+.theme-classic .text-green-400 { color: #000080 !important; }
+.theme-classic .text-green-500 { color: #000080 !important; }
+.theme-classic .text-green-600 { color: #000080 !important; }
+
+/* Borders — classic inset look */
+.theme-classic .border-gray-700 { border-color: #808080 !important; }
+.theme-classic .border-gray-800 { border-color: #808080 !important; }
+.theme-classic .border-gray-600 { border-color: #808080 !important; }
+
+/* Hover */
+.theme-classic .hover\:bg-white\/5:hover { background-color: rgba(0,0,128,0.08) !important; }
+.theme-classic .hover\:bg-gray-700\/50:hover { background-color: rgba(0,0,128,0.08) !important; }
+
+/* Classic — green accents become navy */
+.theme-classic .text-green-400 { color: #000080 !important; }
+.theme-classic .text-green-500 { color: #000080 !important; }
+.theme-classic .text-green-600 { color: #000080 !important; }
+.theme-classic .bg-green-500   { background-color: #000080 !important; }
+.theme-classic .bg-green-400   { background-color: #000080 !important; }
+.theme-classic .text-black     { color: #ffffff !important; }
+.theme-classic .bg-green-500.h-2 { background-color: #000080 !important; }
+.theme-classic .border-green-400  { border-color: #000080 !important; }
+
+/* Progress bars */
+.theme-classic .bg-green-500.h-2 { background-color: #000080 !important; }
+
+/* Spin animation border */
+.theme-classic .border-green-400 { border-color: #000080 !important; }
+
+/* Chat input bar */
+.theme-classic .border-gray-600.rounded { 
+  border: 2px inset #808080 !important;
+  background-color: #ffffff !important;
+}

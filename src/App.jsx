@@ -1,28 +1,54 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { SessionProvider } from './context/SessionContext'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
+import ClassicChrome from './components/ClassicChrome'
 import Viewer from './pages/Viewer'
 import Stats from './pages/Stats'
 import About from './pages/About'
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Viewer />} />
+      <Route path="/stats" element={<Stats />} />
+      <Route path="/about" element={<About />} />
+    </Routes>
+  )
+}
+
+function AppContent() {
+  const { theme } = useTheme()
+  const isClassic = theme === 'classic'
+
+  if (isClassic) {
+    return (
+      <div className="theme-classic">
+        <ClassicChrome>
+          <AppRoutes />
+        </ClassicChrome>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`theme-${theme} flex flex-col h-screen overflow-hidden`}>
+      <Nav />
+      <main className="flex-1 overflow-hidden">
+        <AppRoutes />
+      </main>
+      <Footer />
+    </div>
+  )
+}
 
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
         <SessionProvider>
-          <div className="flex flex-col h-screen overflow-hidden">
-            <Nav />
-            <main className="flex-1 overflow-hidden p-4">
-              <Routes>
-                <Route path="/" element={<Viewer />} />
-                <Route path="/stats" element={<Stats />} />
-                <Route path="/about" element={<About />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <AppContent />
         </SessionProvider>
       </ThemeProvider>
     </BrowserRouter>

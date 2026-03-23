@@ -28,12 +28,17 @@ function Nick({ nick, colour, bracket = true }) {
 
   let hexColour = null
   if (colour != null) {
-    if (theme === 'dark' || theme === 'classic') {
+    if (theme === 'classic') {
+      hexColour = '#000000'  // always black in classic regardless of mIRC colour
+    } else if (theme === 'dark') {
       hexColour = DARK_REMAP[colour] ?? MIRC_COLOURS[colour]
     } else {
       hexColour = LIGHT_REMAP[colour] ?? MIRC_COLOURS[colour]
     }
   }
+
+  // In classic, force all nicks black even if no colour code present
+  if (theme === 'classic') hexColour = hexColour || '#000000'
 
   const style = hexColour ? { color: hexColour } : {}
 

@@ -51,7 +51,7 @@ function DropZone({ onFilesLoaded, onFilesStart }) {
   const handleInputChange = (e) => { if (e.target.files.length > 0) handleFiles(e.target.files) }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+    <div className="flex flex-col items-center justify-center h-full w-full gap-6 bg-gray-950 rounded-1g">
       <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
         {['instant', 'replay'].map(m => (
           <button key={m} onClick={() => setMode(m)} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${mode === m ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'}`}>{m === 'instant' ? '⚡ Instant' : '▶ Replay'}</button>
