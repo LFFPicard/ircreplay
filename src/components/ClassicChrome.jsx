@@ -91,6 +91,7 @@ function ClassicChrome({ children }) {
     { label: 'Viewer', path: '/'      },
     { label: 'Stats',  path: '/stats' },
     { label: 'About',  path: '/about' },
+    { label: 'Help',   path: '/help'  },
   ]
 const themes = [
     { id: 'light',   label: '☀' },

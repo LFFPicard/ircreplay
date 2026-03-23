@@ -7,6 +7,7 @@ import ClassicChrome from './components/ClassicChrome'
 import Viewer from './pages/Viewer'
 import Stats from './pages/Stats'
 import About from './pages/About'
+import Help from './pages/Help'
 
 function AppRoutes() {
   return (
@@ -14,6 +15,7 @@ function AppRoutes() {
       <Route path="/" element={<Viewer />} />
       <Route path="/stats" element={<Stats />} />
       <Route path="/about" element={<About />} />
+      <Route path="/help" element={<Help />} />
     </Routes>
   )
 }
@@ -35,7 +37,7 @@ function AppContent() {
   return (
     <div className={`theme-${theme} flex flex-col h-screen overflow-hidden`}>
       <Nav />
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden p-4">
         <AppRoutes />
       </main>
       <Footer />

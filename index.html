@@ -1,13 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ircreplay</title>
+
+    <!-- Primary SEO -->
+    <title>IRCReplay — IRC Log Viewer &amp; Stats Generator</title>
+    <meta name="description" content="Upload your old mIRC log files and relive the conversation. IRCReplay is a free browser-based IRC log viewer and stats generator — the modern successor to mIRCStats." />
+    <meta name="keywords" content="IRC log viewer, mIRC logs, mIRCStats, IRC stats, IRC replay, IRC log parser, channel stats" />
+    <meta name="author" content="IRCReplay.app" />
+
+    <!-- Open Graph — controls how it looks when shared on Reddit, Discord, Twitter etc -->
+    <meta property="og:title" content="IRCReplay — IRC Log Viewer &amp; Stats Generator" />
+    <meta property="og:description" content="Upload your old mIRC log files and relive the conversation. Free, browser-based, your logs never leave your device." />
+    <meta property="og:url" content="https://ircreplay.app" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="IRCReplay" />
+
+    <!-- Twitter/X card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="IRCReplay — IRC Log Viewer &amp; Stats Generator" />
+    <meta name="twitter:description" content="Upload your old mIRC log files and relive the conversation. Free, browser-based, your logs never leave your device." />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://ircreplay.app" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+```
+
+**Also add a `public/robots.txt`:**
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://ircreplay.app/sitemap.xml
