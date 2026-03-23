@@ -119,11 +119,15 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-2">
           <span className="text-gray-600 text-xs">mIRC .log files</span>
           <span className="text-gray-700 text-xs">&middot;</span>
           <span className="text-gray-600 text-xs">IRCReplay .json sessions</span>
         </div>
+
+        <p className="text-green-400 text-xs text-center mt-2 px-4">
+          🔒 Your log files are processed entirely in your browser and never transmitted to any server
+        </p>
 
       </div>
       {/* ↑ this closes the dashed drop zone border div */}
