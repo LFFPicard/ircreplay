@@ -27,18 +27,22 @@ function Nick({ nick, colour, bracket = true }) {
   const { theme } = useTheme()
 
   let hexColour = null
+
   if (colour != null) {
+    // Colour code present — apply theme-aware remapping
     if (theme === 'classic') {
-      hexColour = '#000000'  // always black in classic regardless of mIRC colour
+      hexColour = '#000000'
     } else if (theme === 'dark') {
       hexColour = DARK_REMAP[colour] ?? MIRC_COLOURS[colour]
     } else {
       hexColour = LIGHT_REMAP[colour] ?? MIRC_COLOURS[colour]
     }
+  } else {
+    // No colour code — use theme default so nicks are always visible
+    if (theme === 'dark')    hexColour = '#a3e635'  // lime green — distinct from message text
+    if (theme === 'light')   hexColour = '#166534'  // dark green
+    if (theme === 'classic') hexColour = '#000000'  // black
   }
-
-  // In classic, force all nicks black even if no colour code present
-  if (theme === 'classic') hexColour = hexColour || '#000000'
 
   const style = hexColour ? { color: hexColour } : {}
 
@@ -137,6 +141,18 @@ function ChatLine({ event }) {
       </div>
     )
   }
+
+  // ── KICK ─────────────────────────────────────────────────────────
+  if (type === 'kick') {
+    return (
+      <div className="flex items-baseline py-0.5 px-2 font-mono text-xs">
+        <Timestamp time={timestamp} />
+        <span className="text-orange-600">*** {text}</span>
+      </div>
+    )
+  }
+
+
 
   // ── TOPIC ─────────────────────────────────────────────────────────
   if (type === 'topic') {
