@@ -131,7 +131,7 @@ function NickProfile({ chatter, onClose }) {
   ]
 
   return (
-    <div className="bg-gray-900 border border-green-500/30 rounded-lg p-4 mt-1">
+    <div className="bg-gray-900 border border-green-500/30 rounded-lg p-4 mt-1 w-full overflow-x-hidden">
 
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-green-400 font-mono font-bold text-lg">{chatter.nick}</h3>
@@ -139,34 +139,34 @@ function NickProfile({ chatter, onClose }) {
       </div>
 
       {/* Static stats */}
-      <div className="grid grid-cols-4 gap-2 mb-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
         {[
           { label: 'Lines',          value: chatter.lines.toLocaleString() },
           { label: 'Words',          value: chatter.words.toLocaleString() },
           { label: 'Avg words/line', value: chatter.avgWords },
           { label: 'Short lines',    value: chatter.shortLines.toLocaleString() },
         ].map(s => (
-          <div key={s.label} className="bg-gray-800 rounded p-2">
+          <div key={s.label} className="bg-gray-800 rounded p-2 min-w-0 overflow-hidden">
             <div className="text-white font-mono text-sm font-bold">{s.value}</div>
-            <div className="text-gray-500 text-xs">{s.label}</div>
+            <div className="text-gray-500 text-xs truncate">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Clickable stats */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
         {clickableStats.map(s => (
           <div
             key={s.key}
             onClick={() => toggleSamples(s.key)}
-            className={`rounded p-2 cursor-pointer transition-colors border ${
+            className={`rounded p-2 cursor-pointer transition-colors border min-w-0 overflow-hidden ${
               showSamples === s.key
                 ? 'bg-gray-700 border-green-500/50'
                 : 'bg-gray-800 border-transparent hover:border-green-500/30 hover:bg-gray-700'
             }`}
           >
             <div className="text-white font-mono text-sm font-bold">{s.value}</div>
-            <div className="text-gray-500 text-xs">{s.label}</div>
+            <div className="text-gray-500 text-xs truncate">{s.label}</div>
             <div className="text-green-600 text-xs mt-0.5">
               {showSamples === s.key ? 'hide examples' : 'click for examples'}
             </div>
@@ -289,7 +289,7 @@ function TopChatters({ topChatters }) {
                 </tr>
                 {selected === chatter.nick && (
                   <tr>
-                    <td colSpan={6} className="pb-3">
+                      <td colSpan={6} className="pb-3 overflow-hidden" style={{ maxWidth: '1px', width: '100%' }}>  
                       <NickProfile chatter={chatter} onClose={() => setSelected(null)} />
                     </td>
                   </tr>
@@ -368,7 +368,7 @@ function UrlList({ urls }) {
 }
 
 function Stats() {
-  const { session } = useSession()
+  const { session, setStats: setStatsCtx } = useSession()
   const [stats,   setStats  ] = useState(null)
   const [loading, setLoading] = useState(false)
   const workerRef = useRef(null)
@@ -383,6 +383,7 @@ function Stats() {
     worker.onmessage = ({ data }) => {
       if (data.type === 'done') {
         setStats(data.stats)
+        setStatsCtx(data.stats)
         setLoading(false)
         worker.terminate()
       }

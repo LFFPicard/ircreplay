@@ -101,6 +101,19 @@
 .theme-classic .bg-green-500.h-2 { background-color: #000080 !important; }
 .theme-classic .border-green-400  { border-color: #000080 !important; }
 
+/* Classic — visible borders on stat cards */
+.theme-classic .bg-gray-800.rounded,
+.theme-classic .bg-gray-800.rounded-lg,
+.theme-classic .bg-gray-900.rounded,
+.theme-classic .bg-gray-900.rounded-lg {
+  border: 1px solid #808080 !important;
+}
+
+/* Classic — inset border on nick profile */
+.theme-classic .border-green-500\/30 {
+  border: 2px solid #808080 !important;
+}
+
 /* Progress bars */
 .theme-classic .bg-green-500.h-2 { background-color: #000080 !important; }
 
