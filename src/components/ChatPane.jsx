@@ -32,26 +32,79 @@ function ChatPane({ session, mode }) {
     })
   }, [playback.visibleCount, mode])
 
-  // Dynamic names panel
-  const dynamicNicks = useMemo(() => {
-    const nickSet = new Set()
+    const dynamicNicks = useMemo(() => {
+    const nickMap = {}  // nick → { op: bool, voice: bool }
+
+    const getOrAdd = (nick) => {
+      if (!nickMap[nick]) nickMap[nick] = { op: false, voice: false }
+      return nickMap[nick]
+    }
+
     for (const event of visibleEvents) {
       if (event.type === 'join' && event.nick) {
-        nickSet.add(event.nick)
+        getOrAdd(event.nick)
       }
       if ((event.type === 'quit' || event.type === 'part') && event.nick) {
-        nickSet.delete(event.nick)
+        delete nickMap[event.nick]
       }
       if (event.type === 'nick' && event.nick) {
-        nickSet.delete(event.nick)
-        if (event.extra?.newNick) nickSet.add(event.extra.newNick)
+        const existing = nickMap[event.nick] || { op: false, voice: false }
+        delete nickMap[event.nick]
+        if (event.extra?.newNick) nickMap[event.extra.newNick] = existing
       }
       if ((event.type === 'message' || event.type === 'action') && event.nick) {
-        nickSet.add(event.nick)
+        getOrAdd(event.nick)
+      }
+      // Track mode changes — +o/-o +v/-v
+      if (event.type === 'mode' && event.extra?.modeString) {
+        const modeStr = event.extra.modeString
+        // Parse mode string like "+o Nick" or "+vv Nick1 Nick2" or "-o+v Nick"
+        const parts  = modeStr.trim().split(/\s+/)
+        const flags  = parts[0] || ''
+        const nicks  = parts.slice(1)
+        let adding   = true
+        let nickIdx  = 0
+        for (const char of flags) {
+          if (char === '+') { adding = true;  continue }
+          if (char === '-') { adding = false; continue }
+          if (char === 'o' || char === 'v') {
+            const target = nicks[nickIdx]
+            nickIdx++
+            if (target) {
+              const entry = getOrAdd(target)
+              if (char === 'o') entry.op    = adding
+              if (char === 'v') entry.voice = adding
+            }
+          } else {
+            // Other mode flags that take a parameter — skip the parameter
+            if ('beIklLjf'.includes(char) && nicks[nickIdx]) nickIdx++
+          }
+        }
       }
     }
-    return [...nickSet].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-  }, [visibleEvents])
+
+    // Sort: ops first, then voiced, then regular — alphabetical within each group
+    const ops     = []
+    const voiced  = []
+    const regular = []
+
+    for (const [nick, flags] of Object.entries(nickMap)) {
+      if (flags.op)    ops.push(nick)
+      else if (flags.voice) voiced.push(nick)
+      else             regular.push(nick)
+    }
+
+    const alpha = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase())
+    ops.sort(alpha)
+    voiced.sort(alpha)
+    regular.sort(alpha)
+
+    return [
+      ...ops.map(n    => ({ nick: n, prefix: '@' })),
+      ...voiced.map(n => ({ nick: n, prefix: '+' })),
+      ...regular.map(n => ({ nick: n, prefix: ''  })),
+    ]
+  }, [mode === 'instant' ? null : visibleEvents, session.nicks, visibleEvents])
 
   return (
     <div className="flex flex-col border border-gray-700 rounded-lg overflow-hidden bg-gray-950 h-full">
