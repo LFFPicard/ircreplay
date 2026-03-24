@@ -125,9 +125,26 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
           <span className="text-gray-600 text-xs">IRCReplay .json sessions</span>
         </div>
 
-        <p className="text-green-400 text-xs text-center mt-2 px-4">
-          🔒 Your log files are processed entirely in your browser and never transmitted to any server
-        </p>
+        <div className="flex flex-col items-center gap-1 mt-3">
+          <p className="text-green-400 text-xs text-center px-4">
+            🔒 Your log files are processed entirely in your browser and never transmitted to any server
+          </p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-gray-600 text-xs">No logs handy?</span>
+            <button
+              onClick={async (e) => {
+                e.stopPropagation()
+                onFilesStart?.(['ircreplay-demo.log'])
+                const res  = await fetch('/ircreplay-demo.log')
+                const text = await res.text()
+                onFilesLoaded([{ filename: 'ircreplay-demo.log', rawText: text }], mode)
+              }}
+              className="text-green-400 hover:text-green-300 text-xs underline transition-colors"
+            >
+              Load the demo log
+            </button>
+          </div>
+        </div>
 
       </div>
       {/* ↑ this closes the dashed drop zone border div */}
