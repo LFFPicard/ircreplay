@@ -59,6 +59,9 @@ function Nav() {
       <NavLink to="/help" className={({ isActive }) => isActive ? 'text-green-400 font-semibold' : 'hover:text-green-400'}>
         Help
       </NavLink>
+      <NavLink to="/links" className={({ isActive }) => isActive ? 'text-green-400 font-semibold' : 'hover:text-green-400'}>
+        Links
+      </NavLink>
 
       <div className="ml-auto flex items-center gap-3">
 

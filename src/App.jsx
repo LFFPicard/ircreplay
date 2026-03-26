@@ -8,6 +8,7 @@ import Viewer from './pages/Viewer'
 import Stats from './pages/Stats'
 import About from './pages/About'
 import Help from './pages/Help'
+import Links from './pages/Links'
 
 function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ function AppRoutes() {
       <Route path="/stats" element={<Stats />} />
       <Route path="/about" element={<About />} />
       <Route path="/help" element={<Help />} />
+      <Route path="/links" element={<Links />} />
     </Routes>
   )
 }
