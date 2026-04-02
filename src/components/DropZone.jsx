@@ -9,7 +9,6 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
     setError(null)
     const files = Array.from(fileList)
 
-    // If a single .json file — restore saved session directly
     if (files.length === 1 && files[0].name.endsWith('.json')) {
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -23,7 +22,6 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
       return
     }
 
-    // Otherwise handle as .log files
     const invalid = files.filter(f => !f.name.endsWith('.log'))
     if (invalid.length > 0) {
       setError(`Unsupported file type: ${invalid.map(f => f.name).join(', ')}`)
@@ -65,10 +63,10 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
   const handleInputChange = (e) => { if (e.target.files.length > 0) handleFiles(e.target.files) }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full gap-6 bg-gray-950 rounded-lg">
+    <div className="flex flex-col items-center justify-start md:justify-center h-full w-full gap-3 md:gap-6 bg-gray-950 rounded-lg overflow-y-auto py-4 md:py-0">
 
       {/* Mode toggle */}
-      <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+      <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1 shrink-0">
         {['instant', 'replay'].map(m => (
           <button
             key={m}
@@ -91,26 +89,28 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`
-          w-full max-w-lg border-2 border-dashed rounded-xl p-16
-          flex flex-col items-center gap-4 cursor-pointer transition-all
+          w-full max-w-lg border-2 border-dashed rounded-xl
+          p-6 md:p-16
+          flex flex-col items-center gap-3 md:gap-4 cursor-pointer transition-all shrink-0
+          mx-4 md:mx-0
           ${isDragging
             ? 'border-green-400 bg-green-400/10 scale-105'
             : 'border-gray-600 hover:border-green-500 hover:bg-gray-800/50'
           }
         `}
       >
-        <div className="text-6xl">📂</div>
-        <p className="text-xl font-semibold text-gray-200">Drop your IRC log files here</p>
+        <div className="text-4xl md:text-6xl">📂</div>
+        <p className="text-lg md:text-xl font-semibold text-gray-200 text-center">Drop your IRC log files here</p>
         <p className="text-gray-400 text-sm">or click to browse</p>
 
-        {/* How To */}
-        <div className="mt-2 space-y-1.5 text-left w-full max-w-xs">
+        {/* How To — hidden on mobile to save space */}
+        <div className="hidden md:block mt-2 space-y-1.5 text-left w-full max-w-xs">
           {[
             ['1', 'Drop one or more mIRC .log files — or a saved .json session'],
             ['2', 'Select Instant to read immediately, or Replay to watch it unfold'],
             ['3', 'Switch to the Stats tab for charts, top chatters and word stats'],
             ['4', 'Export stats as HTML or PDF to share with old channel mates'],
-            ['5', 'Save Session to reload instantly next time with .json — no orignal logs needed'],
+            ['5', 'Save Session to reload instantly next time with .json — no original logs needed'],
           ].map(([num, text]) => (
             <div key={num} className="flex gap-2 text-xs text-gray-500">
               <span className="text-green-600 font-mono shrink-0">{num}.</span>
@@ -119,17 +119,17 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
           ))}
         </div>
 
-          <div className="flex items-center gap-3 mt-2">
+        <div className="flex items-center gap-3 mt-1">
           <span className="text-gray-600 text-xs">mIRC .log files</span>
           <span className="text-gray-700 text-xs">&middot;</span>
           <span className="text-gray-600 text-xs">IRCReplay .json sessions</span>
         </div>
 
-        <div className="flex flex-col items-center gap-1 mt-3">
+        <div className="flex flex-col items-center gap-1 mt-1">
           <p className="text-green-400 text-xs text-center px-4">
             🔒 Your log files are processed entirely in your browser and never transmitted to any server
           </p>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-1">
             <span className="text-gray-600 text-xs">No logs handy?</span>
             <button
               onClick={async (e) => {
@@ -147,9 +147,8 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
         </div>
 
       </div>
-      {/* ↑ this closes the dashed drop zone border div */}
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm shrink-0">{error}</p>}
 
       <input
         id="log-file-input"
@@ -161,7 +160,7 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
       />
 
     </div>
-    )
+  )
 }
 
 export default DropZone

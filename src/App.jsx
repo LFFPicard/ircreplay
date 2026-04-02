@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { SessionProvider } from './context/SessionContext'
 import Nav from './components/Nav'
@@ -22,11 +23,29 @@ function AppRoutes() {
   )
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return isMobile
+}
+
 function AppContent() {
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const isMobile = useIsMobile()
   const isClassic = theme === 'classic'
 
-  if (isClassic) {
+  // Classic theme is desktop only — auto-switch to dark on mobile
+  useEffect(() => {
+    if (isMobile && theme === 'classic') {
+      setTheme('dark')
+    }
+  }, [isMobile, theme, setTheme])
+
+  if (isClassic && !isMobile) {
     return (
       <div className="theme-classic">
         <ClassicChrome>
@@ -38,7 +57,7 @@ function AppContent() {
 
   return (
     <div className={`theme-${theme} flex flex-col h-screen overflow-hidden`}>
-      <Nav />
+      <Nav isMobile={isMobile} />
       <main className="flex-1 overflow-hidden p-4">
         <AppRoutes />
       </main>
