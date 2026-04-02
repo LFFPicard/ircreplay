@@ -58,7 +58,7 @@ function AppContent() {
   return (
     <div className={`theme-${theme} flex flex-col h-screen overflow-hidden`}>
       <Nav isMobile={isMobile} />
-      <main className="flex-1 overflow-hidden p-4">
+      <main className="flex-1 overflow-hidden p-0 md:p-4">
         <AppRoutes />
       </main>
       <Footer />

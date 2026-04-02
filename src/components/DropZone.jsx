@@ -63,7 +63,7 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
   const handleInputChange = (e) => { if (e.target.files.length > 0) handleFiles(e.target.files) }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full gap-3 md:gap-6 bg-gray-950 rounded-lg overflow-hidden px-4 md:px-0">
+    <div className="flex flex-col items-center justify-center h-full w-full gap-3 md:gap-6 bg-gray-950 md:rounded-lg overflow-hidden px-4 md:px-0">
 
       {/* Mode toggle */}
       <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1 shrink-0">
