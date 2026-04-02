@@ -63,7 +63,7 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
   const handleInputChange = (e) => { if (e.target.files.length > 0) handleFiles(e.target.files) }
 
   return (
-    <div className="flex flex-col items-center justify-start md:justify-center h-full w-full gap-3 md:gap-6 bg-gray-950 rounded-lg overflow-y-auto py-4 md:py-0">
+    <div className="flex flex-col items-center justify-center h-full w-full gap-3 md:gap-6 bg-gray-950 rounded-lg overflow-hidden px-4 md:px-0">
 
       {/* Mode toggle */}
       <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1 shrink-0">
@@ -92,7 +92,6 @@ function DropZone({ onFilesLoaded, onFilesStart, onSessionLoaded }) {
           w-full max-w-lg border-2 border-dashed rounded-xl
           p-6 md:p-16
           flex flex-col items-center gap-3 md:gap-4 cursor-pointer transition-all shrink-0
-          mx-4 md:mx-0
           ${isDragging
             ? 'border-green-400 bg-green-400/10 scale-105'
             : 'border-gray-600 hover:border-green-500 hover:bg-gray-800/50'
