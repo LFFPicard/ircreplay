@@ -1,17 +1,15 @@
 export async function onRequestPost(context) {
   const { request, env } = context
 
-  // CORS headers for the response
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': 'https://ircreplay.app',
   }
 
   try {
-    const body = await request.json()
+    const body  = await request.json()
     const email = (body.email || '').trim().toLowerCase()
 
-    // Basic email validation
     if (!email || !email.includes('@') || !email.includes('.')) {
       return new Response(
         JSON.stringify({ success: false, error: 'Please enter a valid email address' }),
@@ -19,7 +17,7 @@ export async function onRequestPost(context) {
       )
     }
 
-    // Add contact to Resend with ircreplay-waitlist tag
+    // Create contact with custom property so we can segment them
     const resendRes = await fetch('https://api.resend.com/contacts', {
       method: 'POST',
       headers: {
@@ -28,21 +26,25 @@ export async function onRequestPost(context) {
       },
       body: JSON.stringify({
         email,
-        tags: ['ircreplay-waitlist'],
         unsubscribed: false,
+        properties: {
+          ircreplay_waitlist: true,
+        },
       }),
     })
 
     if (!resendRes.ok) {
       const err = await resendRes.json()
-      // If contact already exists that is fine — treat as success
-      if (resendRes.status === 409 || (err.name && err.name === 'validation_error')) {
+      console.error('Resend response:', resendRes.status, JSON.stringify(err))
+
+      // Contact already exists — still a success
+      if (resendRes.status === 409) {
         return new Response(
           JSON.stringify({ success: true, alreadySubscribed: true }),
           { status: 200, headers }
         )
       }
-      throw new Error(`Resend error: ${resendRes.status}`)
+      throw new Error(`Resend error: ${resendRes.status} — ${JSON.stringify(err)}`)
     }
 
     return new Response(
@@ -51,7 +53,7 @@ export async function onRequestPost(context) {
     )
 
   } catch (err) {
-    console.error('Waitlist error:', err)
+    console.error('Waitlist error:', err.message)
     return new Response(
       JSON.stringify({ success: false, error: 'Something went wrong, please try again' }),
       { status: 500, headers }
@@ -59,7 +61,6 @@ export async function onRequestPost(context) {
   }
 }
 
-// Handle CORS preflight
 export async function onRequestOptions() {
   return new Response(null, {
     headers: {
