@@ -11,6 +11,7 @@ import About from './pages/About'
 import Help from './pages/Help'
 import Links from './pages/Links'
 import ComingSoon from './pages/ComingSoon'
+import { UserProvider } from './context/UserContext'
 
 function AppRoutes() {
   return (
@@ -73,7 +74,9 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <SessionProvider>
-          <AppContent />
+          <UserProvider>
+            <AppContent />
+          </UserProvider>
         </SessionProvider>
       </ThemeProvider>
     </BrowserRouter>

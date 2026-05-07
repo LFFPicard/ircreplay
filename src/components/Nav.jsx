@@ -266,10 +266,11 @@ function Nav({ isMobile }) {
               Sign Up
             </button>
           </SignUpButton>
+          */}
         </Show>
         <Show when="signed-in">
           <UserButton afterSignOutUrl="/" />
-        </Show>*/}
+        </Show>
 
         {/* Theme switcher */}
         <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">

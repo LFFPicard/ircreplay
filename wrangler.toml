@@ -1,0 +1,7 @@
+name = "ircreplay"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "IRCREPLAY_KV"
+id = "d9eee10cf1f64286907fef0adb318e7b"
+preview_id = "d9eee10cf1f64286907fef0adb318e7b"
