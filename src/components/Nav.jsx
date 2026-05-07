@@ -118,6 +118,14 @@ function Nav({ isMobile }) {
               </button>
             ))}
 
+            {/* Pro button in mobile menu */}
+            <button
+              onClick={() => handleNavClick('/pro')}
+              className="text-left px-6 py-3 text-yellow-400 hover:bg-yellow-500/10 transition-colors border-b border-gray-800 text-sm font-bold"
+            >
+              ⚡ Pro — Coming Soon
+            </button>
+
             {/* Save / Export in menu on mobile */}
             {canSave && (
               <button
@@ -167,6 +175,18 @@ function Nav({ isMobile }) {
           {link.label}
         </NavLink>
       ))}
+
+      {/* Pro coming soon button */}
+      <NavLink
+        to="/pro"
+        className={({ isActive }) =>
+          isActive
+            ? 'bg-yellow-500 text-black text-xs font-bold px-3 py-1.5 rounded-lg'
+            : 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors'
+        }
+      >
+        ⚡ Pro — Coming Soon
+      </NavLink>
 
       <div className="ml-auto flex items-center gap-3">
         {canSave && (

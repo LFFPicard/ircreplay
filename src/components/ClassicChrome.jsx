@@ -93,6 +93,7 @@ function ClassicChrome({ children }) {
     { label: 'About',  path: '/about' },
     { label: 'Help',   path: '/help'  },
     { label: 'Links', path: '/links' },
+    { label: '⚡ Pro', path: '/pro'   },
   ]
 const themes = [
     { id: 'light',   label: '☀' },

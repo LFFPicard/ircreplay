@@ -10,6 +10,7 @@ import Stats from './pages/Stats'
 import About from './pages/About'
 import Help from './pages/Help'
 import Links from './pages/Links'
+import ComingSoon from './pages/ComingSoon'
 
 function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ function AppRoutes() {
       <Route path="/about" element={<About />} />
       <Route path="/help" element={<Help />} />
       <Route path="/links" element={<Links />} />
+      <Route path="/pro" element={<ComingSoon />} />
     </Routes>
   )
 }
