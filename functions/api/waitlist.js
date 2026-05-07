@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
         email,
         unsubscribed: false,
         properties: {
-          ircreplay_waitlist: true,
+          ircreplay_waitlist: 'true',
         },
       }),
     })
