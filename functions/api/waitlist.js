@@ -17,8 +17,8 @@ export async function onRequestPost(context) {
       )
     }
 
-    // Create contact with custom property so we can segment them
-    const resendRes = await fetch('https://api.resend.com/contacts', {
+    // Step 1 — Create the contact
+    const createRes = await fetch('https://api.resend.com/contacts', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${env.RESEND_API_KEY}`,
@@ -27,28 +27,55 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         email,
         unsubscribed: false,
-        properties: {
-          ircreplay_waitlist: 'true',
-        },
       }),
     })
 
-    if (!resendRes.ok) {
-      const err = await resendRes.json()
-      console.error('Resend response:', resendRes.status, JSON.stringify(err))
+    let contactId = null
 
-      // Contact already exists — still a success
-      if (resendRes.status === 409) {
-        return new Response(
-          JSON.stringify({ success: true, alreadySubscribed: true }),
-          { status: 200, headers }
-        )
+    if (createRes.ok) {
+      const created = await createRes.json()
+      contactId = created.id
+    } else if (createRes.status === 409) {
+      // Contact already exists — fetch their ID
+      const getRes = await fetch(`https://api.resend.com/contacts/${encodeURIComponent(email)}`, {
+        headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}` },
+      })
+      if (getRes.ok) {
+        const existing = await getRes.json()
+        contactId = existing.id
       }
-      throw new Error(`Resend error: ${resendRes.status} — ${JSON.stringify(err)}`)
+    } else {
+      const err = await createRes.json()
+      throw new Error(`Create contact failed: ${createRes.status} — ${JSON.stringify(err)}`)
     }
 
+    if (!contactId) {
+      throw new Error('Could not resolve contact ID')
+    }
+
+    // Step 2 — Add contact to the waitlist segment
+    const segmentRes = await fetch(
+      `https://api.resend.com/contacts/${contactId}/segments/${env.RESEND_SEGMENT_ID}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (!segmentRes.ok) {
+      const err = await segmentRes.json()
+      // 409 means already in segment — still a success
+      if (segmentRes.status !== 409) {
+        throw new Error(`Add to segment failed: ${segmentRes.status} — ${JSON.stringify(err)}`)
+      }
+    }
+
+    const alreadySubscribed = createRes.status === 409
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, alreadySubscribed }),
       { status: 200, headers }
     )
 
