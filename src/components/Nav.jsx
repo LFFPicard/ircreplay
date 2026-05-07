@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useSession } from '../context/SessionContext'
 import { generateStatsHtml, downloadFile } from '../lib/exportHtml'
 import { saveSession } from '../lib/exportSession'
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 
 const THEMES_DESKTOP = [
   { id: 'light',   label: '☀️ Light'   },
@@ -126,6 +127,28 @@ function Nav({ isMobile }) {
               ⚡ Pro — Coming Soon
             </button>
 
+           {/* Auth buttons in mobile menu */}
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm w-full">
+                  Sign In
+                </button>
+              </SignInButton>
+              {/* SIGN UP — uncomment when Pro launches
+              <SignUpButton mode="modal">
+                <button className="text-left px-6 py-3 text-green-400 hover:bg-green-500/10 transition-colors border-b border-gray-800 text-sm w-full font-semibold">
+                  Sign Up for Pro
+                </button>
+              </SignUpButton>
+              */}
+            </Show>
+            <Show when="signed-in">
+              <div className="px-6 py-3 border-b border-gray-800 flex items-center gap-3">
+                <UserButton afterSignOutUrl="/" />
+                <span className="text-gray-400 text-sm">Account</span>
+              </div>
+            </Show>
+
             {/* Save / Export in menu on mobile */}
             {canSave && (
               <button
@@ -168,8 +191,10 @@ function Nav({ isMobile }) {
   // ── DESKTOP NAV ──────────────────────────────────────────────────
   return (
     <nav className="flex items-center gap-6 px-6 py-4 bg-gray-900 text-white shrink-0">
+      {/* Logo */}
       <span className="font-bold text-lg text-green-400 mr-4">IRCReplay</span>
 
+      {/* Nav links */}
       {NAV_LINKS.map(link => (
         <NavLink key={link.to} to={link.to} className={linkClass}>
           {link.label}
@@ -189,6 +214,8 @@ function Nav({ isMobile }) {
       </NavLink>
 
       <div className="ml-auto flex items-center gap-3">
+
+        {/* Save session button */}
         {canSave && (
           <button
             onClick={handleSave}
@@ -198,6 +225,8 @@ function Nav({ isMobile }) {
             💾 Save Session
           </button>
         )}
+
+        {/* Export controls */}
         {canExport && (
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
@@ -223,6 +252,26 @@ function Nav({ isMobile }) {
             </button>
           </div>
         )}
+
+        {/* Auth buttons */}
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <button className="text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+              Sign In
+            </button>
+          </SignInButton>
+          {/* SIGN UP — uncomment when Pro launches
+          <SignUpButton mode="modal">
+            <button className="bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+              Sign Up
+            </button>
+          </SignUpButton>
+        </Show>
+        <Show when="signed-in">
+          <UserButton afterSignOutUrl="/" />
+        </Show>*/}
+
+        {/* Theme switcher */}
         <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
           {THEMES_DESKTOP.map(t => (
             <button
@@ -238,6 +287,7 @@ function Nav({ isMobile }) {
             </button>
           ))}
         </div>
+
       </div>
     </nav>
   )
