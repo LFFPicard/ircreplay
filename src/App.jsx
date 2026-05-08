@@ -12,6 +12,7 @@ import Help from './pages/Help'
 import Links from './pages/Links'
 import ComingSoon from './pages/ComingSoon'
 import { UserProvider } from './context/UserContext'
+import Pricing from './pages/Pricing'
 
 function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ function AppRoutes() {
       <Route path="/help" element={<Help />} />
       <Route path="/links" element={<Links />} />
       <Route path="/pro" element={<ComingSoon />} />
+      <Route path="/pricing" element={<Pricing />} />
     </Routes>
   )
 }

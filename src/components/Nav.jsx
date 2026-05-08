@@ -23,6 +23,7 @@ const NAV_LINKS = [
   { to: '/about', label: 'About'  },
   { to: '/help',  label: 'Help'   },
   { to: '/links', label: 'Links'  },
+  { to: '/pricing', label: 'Pricing' },
 ]
 
 function Nav({ isMobile }) {
