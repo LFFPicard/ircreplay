@@ -1,12 +1,16 @@
 /**
  * IRCReplay Log Parser
- * Handles multiple mIRC log formats with auto-detection.
+ * Handles multiple IRC log formats with auto-detection.
  *
- * Format A — mIRC with binary control codes (your personal logs):
+ * Format A — mIRC with binary control codes:
  *   \x03NN[HH:MM]\x03 content
  *
- * Format B — mIRC plain text (no control codes, e.g. mIRCStats sample logs):
+ * Format B — mIRC plain text (no control codes):
  *   [HH:MM] content
+ *
+ * Format C — XChat / HexChat:
+ *   Mon DD HH:MM:SS <nick>\tcontent
+ *   Mon DD HH:MM:SS *\tevent content
  */
 
 // ─────────────────────────────────────────────
@@ -46,26 +50,24 @@ function extractColour(str) {
 // FORMAT DETECTION
 // ─────────────────────────────────────────────
 
-/**
- * Inspects the first 30 lines and returns the detected format:
- *   'binary'    — mIRC with \x03 control codes (Format A)
- *   'plaintext' — mIRC plain text no control codes (Format B)
- */
 function detectFormat(lines) {
   for (const line of lines.slice(0, 30)) {
     if (!line.trim()) continue
-    // Binary format has \x03 before the timestamp
+    // Binary mIRC — \x03 control code before timestamp
     if (/^\x03\d{1,2}\[/.test(line)) return 'binary'
-    // Plain text has timestamp directly at start
+    // mIRC plain text — [HH:MM] timestamp
     if (/^\[\d{1,2}:\d{2}\]/.test(line)) return 'plaintext'
-    // Session headers exist in both — skip them
+    // XChat/HexChat — Mon DD HH:MM:SS or **** BEGIN LOGGING
+    if (/^\*\*\*\* (BEGIN|ENDING) LOGGING/.test(line)) return 'xchat'
+    if (/^[A-Z][a-z]{2} \d{1,2} \d{2}:\d{2}:\d{2}/.test(line)) return 'xchat'
+    // Session headers — skip
     if (/^Session (Start|Close|Ident|Time):/.test(line)) continue
   }
   return 'plaintext'
 }
 
 // ─────────────────────────────────────────────
-// TIMESTAMP
+// TIMESTAMP HELPERS
 // ─────────────────────────────────────────────
 
 function parseTimestamp(line) {
@@ -81,35 +83,44 @@ function stripPlainTimestampPrefix(line) {
   return line.replace(/^\[\d{1,2}:\d{2}\]\s*/, '').trim()
 }
 
+// XChat timestamp: extracts HH:MM from "May 07 16:25:44"
+function parseXChatTimestamp(line) {
+  const m = line.match(/^[A-Z][a-z]{2} \d{1,2} (\d{2}:\d{2}):\d{2}/)
+  return m ? m[1] : null
+}
+
+// Strips "May 07 16:25:44 " prefix, returns the rest
+function stripXChatTimestampPrefix(line) {
+  return line.replace(/^[A-Z][a-z]{2} \d{1,2} \d{2}:\d{2}:\d{2} /, '').trim()
+}
+
 // ─────────────────────────────────────────────
-// SHARED EVENT BUILDERS
-// Used by both parsers — same output shape regardless of format
+// SHARED EVENT BUILDER
 // ─────────────────────────────────────────────
 
 function makeEvent(overrides = {}) {
   return {
-    type:     'unknown',
+    type:      'unknown',
     timestamp: null,
-    nick:     null,
-    text:     null,
-    rawText:  null,
-    colour:   null,
-    hostmask: null,
-    extra:    {},
-    raw:      '',
+    nick:      null,
+    text:      null,
+    rawText:   null,
+    colour:    null,
+    hostmask:  null,
+    extra:     {},
+    raw:       '',
     ...overrides,
   }
 }
 
-/**
- * Parses the body (post-timestamp content) for system/event lines.
- * Used by both parsers since *** lines are the same in both formats.
- * Returns a partial event object or null if not a system line.
- */
+// ─────────────────────────────────────────────
+// SHARED SYSTEM BODY PARSER (mIRC *** lines)
+// ─────────────────────────────────────────────
+
 function parseSystemBody(body, timestamp, rawLine) {
   const clean = stripControlCodes(body)
 
-  // Action: * nick text
+  // Action: * nick text (not ***)
   if (body.startsWith('* ') && !body.startsWith('***')) {
     const m = body.match(/^\*\s+(\S+)\s*(.*)/)
     if (m) return makeEvent({ type: 'action', timestamp, nick: m[1], text: stripControlCodes(m[2]), rawText: m[2], raw: rawLine })
@@ -157,7 +168,7 @@ function parseSystemBody(body, timestamp, rawLine) {
 }
 
 // ─────────────────────────────────────────────
-// FORMAT A — BINARY (your personal mIRC logs)
+// FORMAT A — BINARY (mIRC with control codes)
 // ─────────────────────────────────────────────
 
 function parseLineBinary(rawLine) {
@@ -201,14 +212,13 @@ function parseLineBinary(rawLine) {
 }
 
 // ─────────────────────────────────────────────
-// FORMAT B — PLAIN TEXT (mIRCStats sample, no control codes)
+// FORMAT B — PLAIN TEXT (mIRCStats sample)
 // ─────────────────────────────────────────────
 
 function parseLinePlainText(rawLine) {
   const timestamp = parseTimestamp(rawLine)
   const event     = makeEvent({ timestamp, raw: rawLine })
 
-  // Session markers
   if (/^Session Start:/.test(rawLine)) return { ...event, type: 'session', extra: { sessionType: 'start' }, text: rawLine.replace('Session Start:', '').trim() }
   if (/^Session Close:/.test(rawLine)) return { ...event, type: 'session', extra: { sessionType: 'close' }, text: rawLine.replace('Session Close:', '').trim() }
   if (/^Session Time:/.test(rawLine))  return { ...event, type: 'session', extra: { sessionType: 'time'  }, text: rawLine.replace('Session Time:', '').trim() }
@@ -224,14 +234,137 @@ function parseLinePlainText(rawLine) {
   const sys = parseSystemBody(body, timestamp, rawLine)
   if (sys) return sys
 
-  // Notice: -nick- text
   const notice = body.match(/^-(.+?)-\s*(.+)/)
   if (notice) return { ...event, type: 'notice', nick: notice[1].trim(), text: notice[2].trim() }
 
-  // Message <nick> or <+nick> (voiced)
   const msgAngle = body.match(/^<\+?(\S+?)>\s*(.*)/)
   if (msgAngle) return { ...event, type: 'message', nick: msgAngle[1], text: msgAngle[2], rawText: body }
 
+  event.text = body
+  return event
+}
+
+// ─────────────────────────────────────────────
+// FORMAT C — XCHAT / HEXCHAT
+// ─────────────────────────────────────────────
+
+/**
+ * XChat log format (default logging, timestamped):
+ *   May 07 16:25:44 <nick>\tmessage
+ *   May 07 16:25:44 *\tevent content
+ *   May 07 16:25:44 -nick-\tnotice content
+ *
+ * Without timestamps (same format minus the date prefix):
+ *   <nick>\tmessage
+ *   *\tevent content
+ *
+ * System events use single * not ***
+ * Mode expressed as "gives channel operator status to" / "gives voice to"
+ */
+function parseLineXChat(rawLine) {
+  // Header/footer lines
+  if (/^\*\*\*\* BEGIN LOGGING/.test(rawLine)) {
+    const m = rawLine.match(/\*\*\*\* BEGIN LOGGING AT (.+)/)
+    return makeEvent({ type: 'session', extra: { sessionType: 'start' }, text: m ? m[1].trim() : '', raw: rawLine })
+  }
+  if (/^\*\*\*\* ENDING LOGGING/.test(rawLine)) {
+    const m = rawLine.match(/\*\*\*\* ENDING LOGGING AT (.+)/)
+    return makeEvent({ type: 'session', extra: { sessionType: 'close' }, text: m ? m[1].trim() : '', raw: rawLine })
+  }
+
+  // Extract timestamp if present
+  const timestamp = parseXChatTimestamp(rawLine)
+
+  // Strip the timestamp prefix — works whether timestamp exists or not
+  const body = stripXChatTimestampPrefix(rawLine)
+  if (!body) return makeEvent({ timestamp, raw: rawLine })
+
+  // Split on tab — XChat separates event type from content with \t
+  const tabIdx  = body.indexOf('\t')
+  const prefix  = tabIdx >= 0 ? body.slice(0, tabIdx) : body
+  const content = tabIdx >= 0 ? body.slice(tabIdx + 1).trim() : ''
+
+  const event = makeEvent({ timestamp, raw: rawLine })
+
+  // ── MESSAGES: <nick> ────────────────────────────────────────────
+  const msgMatch = prefix.match(/^<\+?(\S+?)>$/)
+  if (msgMatch) {
+    return { ...event, type: 'message', nick: msgMatch[1], text: content, rawText: body }
+  }
+
+  // ── NOTICES: -nick- ─────────────────────────────────────────────
+  const noticeMatch = prefix.match(/^-(.+?)-$/)
+  if (noticeMatch) {
+    return { ...event, type: 'notice', nick: noticeMatch[1].trim(), text: content }
+  }
+
+  // ── SYSTEM EVENTS: * ────────────────────────────────────────────
+  if (prefix === '*') {
+
+    // Self join: Now talking on #channel
+    const selfJoin = content.match(/^Now talking on\s+(\S+)/)
+    if (selfJoin) return { ...event, type: 'system', extra: { subtype: 'self-join', channel: selfJoin[1] }, text: `Now talking in ${selfJoin[1]}` }
+
+    // Topic info: Topic for #channel is: text
+    const topicIs = content.match(/^Topic for\s+(\S+)\s+is:\s*(.*)/)
+    if (topicIs) return { ...event, type: 'topic', extra: { channel: topicIs[1] }, text: topicIs[2] }
+
+    // Topic set by: Topic for #channel set by nick at date
+    const topicSet = content.match(/^Topic for\s+(\S+)\s+set by\s+(\S+)/)
+    if (topicSet) return { ...event, type: 'system', text: `Topic set by ${topicSet[2]}` }
+
+    // Join: nick (hostmask) has joined #channel
+    const join = content.match(/^(\S+)\s+\((.+?)\)\s+has joined\s+(\S+)/)
+    if (join) return { ...event, type: 'join', nick: join[1], hostmask: join[2], extra: { channel: join[3] }, text: `${join[1]} has joined ${join[3]}` }
+
+    // Part: nick (hostmask) has left #channel (reason)
+    const part = content.match(/^(\S+)\s+(?:\((.+?)\)\s+)?has left\s+(\S+)(?:\s+\((.+)\))?/)
+    if (part) return { ...event, type: 'part', nick: part[1], hostmask: part[2] || null, extra: { channel: part[3], reason: part[4] || '' }, text: `${part[1]} has left ${part[3]}` }
+
+    // Quit: nick has quit (reason)  OR  nick (hostmask) has quit (reason)
+    const quit = content.match(/^(\S+)\s+(?:\((.+?)\)\s+)?has quit(?:\s+\((.+)\))?/)
+    if (quit) {
+      const reason = quit[3] || ''
+      return { ...event, type: 'quit', nick: quit[1], hostmask: quit[2] || null, extra: { reason }, text: reason ? `${quit[1]} has quit (${reason})` : `${quit[1]} has quit` }
+    }
+
+    // Nick change: nick is now known as newnick
+    const nickChange = content.match(/^(\S+)\s+is now known as\s+(\S+)/)
+    if (nickChange) return { ...event, type: 'nick', nick: nickChange[1], extra: { newNick: nickChange[2] }, text: `${nickChange[1]} is now known as ${nickChange[2]}` }
+
+    // Kick: nick was kicked by othernick (reason)
+    const kick = content.match(/^(\S+)\s+was kicked by\s+(\S+)(?:\s+\((.+)\))?/)
+    if (kick) return { ...event, type: 'kick', nick: kick[1], extra: { by: kick[2], reason: kick[3] || '' }, text: `${kick[1]} was kicked by ${kick[2]}${kick[3] ? ` (${kick[3]})` : ''}` }
+
+    // Mode — XChat uses natural language rather than +o/-o notation
+    // "nick gives channel operator status to target"
+    const opGive = content.match(/^(\S+)\s+gives channel operator status to\s+(.+)/)
+    if (opGive) return { ...event, type: 'mode', nick: opGive[1], extra: { modeString: `+o ${opGive[2]}` }, text: `${opGive[1]} sets mode: +o ${opGive[2]}` }
+
+    // "nick gives voice to target"
+    const voiceGive = content.match(/^(\S+)\s+gives voice to\s+(.+)/)
+    if (voiceGive) return { ...event, type: 'mode', nick: voiceGive[1], extra: { modeString: `+v ${voiceGive[2]}` }, text: `${voiceGive[1]} sets mode: +v ${voiceGive[2]}` }
+
+    // "nick removes channel operator status from target"
+    const opRemove = content.match(/^(\S+)\s+removes channel operator status from\s+(.+)/)
+    if (opRemove) return { ...event, type: 'mode', nick: opRemove[1], extra: { modeString: `-o ${opRemove[2]}` }, text: `${opRemove[1]} sets mode: -o ${opRemove[2]}` }
+
+    // "nick removes voice from target"
+    const voiceRemove = content.match(/^(\S+)\s+removes voice from\s+(.+)/)
+    if (voiceRemove) return { ...event, type: 'mode', nick: voiceRemove[1], extra: { modeString: `-v ${voiceRemove[2]}` }, text: `${voiceRemove[1]} sets mode: -v ${voiceRemove[2]}` }
+
+    // Action: * nick does something (XChat /me lines)
+    // In XChat, /me appears as: * nick text (no tab, just the content)
+    const action = content.match(/^(\S+)\s+(.+)/)
+    if (action && !content.match(/^(\S+)\s+(has|is|was|gives|removes)/)) {
+      return { ...event, type: 'action', nick: action[1], text: action[2] }
+    }
+
+    // Fallback system line
+    return { ...event, type: 'system', text: content }
+  }
+
+  // Fallback
   event.text = body
   return event
 }
@@ -243,7 +376,11 @@ function parseLinePlainText(rawLine) {
 function parseLog(rawText) {
   const lines  = rawText.split('\n')
   const format = detectFormat(lines)
-  const parseFn = format === 'binary' ? parseLineBinary : parseLinePlainText
+
+  let parseFn
+  if (format === 'binary')   parseFn = parseLineBinary
+  else if (format === 'xchat') parseFn = parseLineXChat
+  else                         parseFn = parseLinePlainText
 
   const events = []
   let channel     = null
@@ -263,6 +400,18 @@ function parseLog(rawText) {
     if (event.type === 'system' && event.extra.subtype === 'self-join') {
       channel = channel || event.extra.channel
     }
+  }
+
+  // XChat logs don't have Session Ident — extract channel from self-join
+  if (!channel) {
+    const selfJoin = events.find(e => e.type === 'system' && e.extra.subtype === 'self-join')
+    if (selfJoin) channel = selfJoin.extra.channel
+  }
+
+  // XChat logs don't have Session Start — use BEGIN LOGGING date
+  if (!sessionDate) {
+    const start = events.find(e => e.type === 'session' && e.extra.sessionType === 'start')
+    if (start) sessionDate = start.text
   }
 
   const nickSet = new Set()
@@ -299,6 +448,7 @@ export {
   parseLog,
   parseLineBinary,
   parseLinePlainText,
+  parseLineXChat,
   stripControlCodes,
   extractColour,
   detectFormat,

@@ -50,7 +50,7 @@ const supportedItems = [
     { label: 'UTF-8 encoded log files',                  dot: 'bg-green-500',  text: 'text-green-400',  slabel: 'Supported'   },
     { label: 'Session save and restore via JSON',        dot: 'bg-green-500',  text: 'text-green-400',  slabel: 'Supported'   },
     { label: 'irssi log format',                         dot: 'bg-yellow-500', text: 'text-yellow-400', slabel: 'In Progress' },
-    { label: 'XChat / HexChat log format',               dot: 'bg-yellow-500', text: 'text-yellow-400', slabel: 'In Progress' },
+    { label: 'XChat / HexChat log format',               dot: 'bg-green-500',  text: 'text-green-400',  slabel: 'Supported'   },
     { label: 'ZNC bouncer log format',                   dot: 'bg-yellow-500', text: 'text-yellow-400', slabel: 'In Progress' },
     { label: 'Textual log format',                       dot: 'bg-yellow-500', text: 'text-yellow-400', slabel: 'In Progress' },
     { label: 'Latin-1 / Windows-1252 encoded files',     dot: 'bg-yellow-500', text: 'text-yellow-400', slabel: 'In Progress' },

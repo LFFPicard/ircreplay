@@ -1,187 +1,259 @@
 # CLAUDE.md — IRCReplay.app
 
 ## Project Overview
-Browser-based IRC log viewer and statistics generator. Users drag-and-drop IRC log files, view them in a themed chat interface, and explore channel statistics. Fully client-side — no server, no database.
+Browser-based IRC log viewer and statistics generator. Users drag-and-drop IRC log files, view them in a themed chat interface, and explore channel statistics. Fully client-side for the free tier — no server, no database.
 
-A premium tier is in active planning. The build order is: SEO + email capture first, then auth, then storage, then billing.
+A premium tier is in active build. Auth and KV storage are live. Billing is blocked on LemonSqueezy identity verification.
 
 ## Stack
 
-### Current (free tier, static)
+### Current (live)
 - **Framework:** Vite + React (JavaScript, no TypeScript)
 - **Styling:** Tailwind CSS
 - **Routing:** react-router-dom
 - **Charts:** Recharts (stats page)
-- **Hosting:** Cloudflare Pages (auto-deploys from GitHub on push to `main`)
+- **Virtual scrolling:** @tanstack/react-virtual
+- **Auth:** @clerk/react v6 (Core 3) — ClerkProvider in main.jsx
+- **Hosting:** Cloudflare Pages (auto-deploys from GitHub push to `main`)
+- **Functions:** Cloudflare Pages Functions (`/functions` folder at project root)
+- **KV:** Cloudflare KV — namespace `IRCREPLAY_KV`, bound in CF Pages settings
+- **Email:** Resend — waitlist signups via `/api/waitlist` function
 - **Repo:** github.com/LFFPicard/ircreplay (public)
 - **Domain:** ircreplay.app
 
 ### Planned additions (premium tier)
-- **Auth:** Clerk.dev — chosen over Supabase Auth because Vite/CF Pages integration is cleaner. Drop-in ClerkProvider wrapper.
-- **Backend API:** Cloudflare Pages Functions — `/functions` folder alongside the existing Vite site. No separate deployment needed.
-- **File storage:** Cloudflare R2 — zero egress fees, native to CF Pages. Log files uploaded via presigned URLs (client uploads directly to R2, never passes through the function).
-- **Database (user/subscription records):** Cloudflare KV — lightweight key/value for user state and premium flags. No Supabase needed at this scale.
-- **Billing:** LemonSqueezy — acts as Merchant of Record, handles EU VAT automatically. Use for recurring subscriptions. **NOT Stripe** (tax complexity). 
-- **LTD launch payments:** PayPal — simpler for one-time lifetime deal payments before full billing infrastructure is live. Manual premium grant is fine at launch scale.
-- **Transactional email:** Resend — for subscription confirmations and welcome emails.
+- **File storage:** Cloudflare R2 — zero egress fees, native to CF Pages. Log files uploaded via presigned URLs.
+- **Billing:** LemonSqueezy — Merchant of Record, handles EU VAT. NOT Stripe (tax complexity).
+- **Transactional email:** Resend — subscription confirmations and welcome emails.
+
+## Environment Variables (Cloudflare Pages + .env.local)
+
+| Variable | Used in | Notes |
+|---|---|---|
+| `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk publishable key — safe to expose |
+| `RESEND_API_KEY` | CF Function | Resend API key for waitlist |
+| `RESEND_SEGMENT_ID` | CF Function | Resend segment ID for waitlist |
+| `LEMONSQUEEZY_VARIANT_MONTHLY` | Frontend/Function | Variant ID 1628924 |
+| `LEMONSQUEEZY_VARIANT_ANNUAL` | Frontend/Function | Variant ID 1628930 |
+| `LEMONSQUEEZY_VARIANT_LTD` | Frontend/Function | Variant ID 1628935 |
+| `LEMONSQUEEZY_STORE_ID` | Function | Store ID (no # prefix) |
+| `LEMONSQUEEZY_API_KEY` | Function | Awaiting identity verification |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | Function | Generated when webhook is created |
 
 ## Architecture
-- All processing happens client-side in Web Workers for non-blocking parsing of large log files.
-- Virtual scrolling for rendering large chat histories without DOM overload.
-- Three visual themes for the chat view.
-- No backend, no auth, no database — purely static site.
 
-### Planned architecture additions (premium)
-- CF Pages Functions will add a thin API layer at `/functions/api/`. These are Worker-based edge functions.
-- R2 bucket scoped per user ID. Presigned URL flow: client requests upload URL from function → uploads directly to R2 → function records metadata in KV.
-- Premium flag lives in Cloudflare KV keyed by Clerk user ID. LemonSqueezy webhook flips this flag.
-- All premium features gate on `isPremium` check against KV at request time.
+### Free tier (fully client-side)
+- All log parsing in Web Workers — non-blocking, handles 136k+ messages
+- Virtual scrolling — only visible rows rendered regardless of log size
+- Three themes — Dark, Light, Classic (desktop-only)
+- Session JSON save/load — no server needed
+- Stats engine in Web Worker
+
+### Premium tier (in build)
+- CF Pages Functions provide thin API at `/functions/api/`
+- KV stores user records keyed by Clerk user ID: `user:{userId}`
+- User record shape: `{ userId, createdAt, isPremium, premiumSince }`
+- R2 bucket scoped per user ID (not yet built)
+- LemonSqueezy webhook flips `isPremium` flag in KV
+- All premium features gate on `isPremium` from KV
 
 ## Key Directories
 ```
 src/
-├── pages/          # Viewer.jsx, Stats.jsx
-├── components/     # ChatPane, stat display components
+├── pages/          # Viewer, Stats, About, Help, Links, ComingSoon, Pricing
+├── components/     # Nav, ChatPane, NamesPanel, ChatLine, DropZone, Footer,
+│                   # PlaybackControls, ClassicChrome
 ├── workers/        # parseWorker.js, statsWorker.js
-├── lib/            # parser.js, mergelogs.js, core logic
-└── context/        # SessionContext (React context for parsed data)
+├── lib/            # parser.js, mergelogs.js, exportHtml.js, exportSession.js
+├── hooks/          # usePlayback.js
+└── context/        # SessionContext, ThemeContext, UserContext
 
-functions/          # CF Pages Functions (to be created — premium API layer)
-├── api/
-│   ├── logs.js     # R2 presigned URL generation, log CRUD
-│   └── user.js     # User state, premium flag checks
+functions/
+└── api/
+    ├── waitlist.js       # Resend email capture — LIVE
+    ├── user.js           # KV user record create/fetch — LIVE
+    └── webhook/
+        └── lemonsqueezy.js  # TO BUILD — awaiting LS verification
 ```
 
+## Clerk Auth — IMPORTANT
+- Package: `@clerk/react` v6 (Core 3) — NOT `@clerk/clerk-react`
+- Import path matters — wrong package = missing exports error
+- v6 uses `<Show when="signed-out">` / `<Show when="signed-in">` NOT `<SignedIn>` / `<SignedOut>` (those are deprecated in Core 3)
+- `ClerkProvider` wraps the app in `main.jsx` — NOT in `App.jsx`
+- Sign ups are RESTRICTED in Clerk dashboard — invite only until Pro launches
+- Sign Up buttons are commented out in Nav.jsx ready to uncomment at launch
+- `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local` for local dev + Cloudflare env vars for production
+
 ## Web Workers
-- `src/workers/parseWorker.js` — Parses raw IRC log text into structured message objects. Imports from `../lib/parser.js` and `../lib/mergelogs.js`.
-- `src/workers/statsWorker.js` — Computes channel statistics from parsed data.
-- Workers are imported using Vite's `?worker` suffix syntax:
+- Workers live in `src/workers/`, import from `../lib/` (relative path)
+- Import syntax — ALWAYS use Vite `?worker` suffix:
   ```js
   import ParseWorker from '../workers/parseWorker.js?worker'
   const worker = new ParseWorker()
   ```
-  Do NOT use `new Worker(new URL(...), { type: 'module' })` — it's unreliable in Vite.
+- Do NOT use `new Worker(new URL(...), { type: 'module' })` — unreliable in Vite
 
 ## Parser
-- Handles mIRC-format logs (timestamps, nicks, actions, joins/parts/quits, mode changes, topic changes).
-- `stripControlCodes` removes IRC formatting codes.
-- `extractColour` / `MIRC_COLOURS` handle mIRC colour code rendering.
-- `sortLogFiles` merges and chronologically sorts multiple log files.
+- Auto-detects log format via `detectFormat()` — inspects first 30 lines
+- Format A: mIRC binary (real `\x03` control codes) — your personal logs
+- Format B: mIRC plain text (no control codes) — mIRCStats sample format
+- `stripControlCodes` removes IRC formatting bytes
+- `extractColour` / `MIRC_COLOURS` handle mIRC 16-colour palette
+- `sortLogFiles` merges and chronologically orders multiple log files
+- Shared `parseSystemBody()` handles `***` event lines across all formats
+
+## Supported Log Formats
+| Format | Status |
+|---|---|
+| mIRC default (binary control codes) | ✅ Live |
+| mIRC plain text | ✅ Live |
+| Multi-file merge with date ordering | ✅ Live |
+| irssi | 🔄 Planned |
+| XChat / HexChat | 🔄 Planned |
+| ZNC bouncer | 🔄 Planned |
 
 ## Themes
-Three chat display themes available to users. Classic theme is desktop-only.
+- Dark, Light, Classic — switched via ThemeContext
+- Classic is desktop-only — auto-switches to Dark on mobile (screen width < 768px)
+- Classic uses Fixedsys Excelsior font from CDN, falls back to Courier New
+- CSS overrides per theme class in `index.css` — Tailwind arbitrary values not used for theme colours
+
+## LemonSqueezy Products
+| Product | Variant ID | Type |
+|---|---|---|
+| Pro Monthly | 1628924 | Subscription |
+| Pro Annual | 1628930 | Subscription |
+| Lifetime Deal | 1628935 | One-time |
+
+Checkout URL format: `https://ircreplay.lemonsqueezy.com/checkout/buy/{variantId}?checkout[custom][clerk_user_id]={userId}`
+
+The `clerk_user_id` custom param is how the webhook knows which KV record to update.
 
 ## Known Gotchas — IMPORTANT
-- **Vite/OXC JSX parser strictness:** Comparison operators (`<`, `>`) and special characters in JSX expressions MUST be pre-computed into variables or use HTML entities. Standalone `>` in multi-line JSX causes build errors. This is a recurring issue — always extract comparisons to `const` before the return statement.
-- **Worker import paths:** Workers live in `src/workers/` but import utilities from `src/lib/`. Relative paths must use `../lib/` prefix.
-- **MIME type errors on workers** are almost always a "file not found" — Vite returns a 404 HTML page and the browser complains about MIME types instead of saying the file is missing.
-- **CF Pages Functions + Vite together:** The `functions/` folder must sit at the project root (not inside `src/`). CF Pages detects it automatically. Vite's dev server does not run functions locally — use `wrangler pages dev dist` for local function testing after a build.
-- **Presigned URLs and CORS:** R2 bucket will need a CORS policy that allows PUT from the domain. Set this in the Cloudflare dashboard before testing uploads.
-- **Clerk + CF Pages:** Use `@clerk/clerk-react` (not the Next.js package). ClerkProvider wraps the React Router root. Protected routes use `<SignedIn>` / `<SignedOut>` components or the `useAuth()` hook.
 
-## Planned Work
+### OXC JSX Parser (most common issue)
+Vite 6 uses OXC which is stricter than previous parsers. These ALL cause build errors:
+- Comparison operators (`<`, `>`) inline in JSX className strings
+- Ternary operators inline in JSX className strings  
+- Multi-line JSX attributes with `>` on their own line
+- Special characters (`©`, `—`, emojis) directly in JSX text
+- JSX comments `{/* */}` that accidentally swallow closing tags
 
-### Priority 1 — SEO and email capture (do this before any premium build)
-The Reddit spike and scriptserv.com referral are warm traffic landing on a free tool with no retention mechanism. Fix this first:
-- Vite is a SPA — Googlebot may not be indexing it well. Audit with Google Search Console.
-- Add `react-helmet-async` (or Vite SSG plugin) for per-page `<title>`, `<meta description>`, and OpenGraph tags.
-- Create `public/robots.txt` and `public/sitemap.xml`.
-- Add OpenGraph social preview image (1200×630px).
-- **Add email capture banner** — "Pro features coming soon — get notified." Even 50 email signups is a warm list for the LTD launch. Use a simple Resend form or a Netlify/CF form.
-- Add a "Coming Soon" section to the landing page listing the planned premium features by name.
-- Target keywords: `IRC log viewer`, `IRC replay`, `mIRC log parser`, `IRC chat history`, `IRC log reader online`
+**Fix pattern — ALWAYS do this:**
+```jsx
+// WRONG
+<div className={`text-${value > 10 ? 'red' : 'green'}-400`}>
 
-### Priority 2 — Mobile responsiveness
-- Hamburger menu for mobile nav
-- Classic theme restricted to desktop only
-- Dropzone layout improvements on small screens
+// RIGHT — pre-compute before return
+const colour = value > 10 ? 'text-red-400' : 'text-green-400'
+return <div className={colour}>
+```
 
-### Priority 3 — Premium tier (phases below)
-Build phases in order. Do not skip phases — each one is a prerequisite for the next.
+Use HTML entities for special chars: `&copy;` `&mdash;` `&middot;` `&#9889;` etc.
 
-### Priority 4 — Parser expansion
-Expanded parser support as more log formats and log samples become available.
+### Worker Import Paths
+Workers in `src/workers/` import from `src/lib/` — use `../lib/` prefix. Wrong path = MIME type error (Vite returns 404 HTML, browser complains about MIME type instead of saying file not found).
 
-## Premium Tier Roadmap
+### CF Pages Functions Local Testing
+`npm run dev` does NOT run CF Pages Functions. To test functions locally:
+```bash
+npm run build
+wrangler pages dev dist
+```
+Opens at `http://localhost:8788`. Requires `wrangler.toml` at project root with KV namespace binding.
 
-### Phase 0 — Auth (1–2 weeks)
-**Goal:** User accounts exist. Nothing is premium-gated yet.
-- Install `@clerk/clerk-react`
-- Wrap React Router root with `ClerkProvider` (publishable key from Clerk dashboard)
-- Add `/login` and `/signup` pages using Clerk's prebuilt components
-- Protect the `/dashboard` route with `<SignedIn>` redirect
-- Store minimal user record in Cloudflare KV on first sign-in: `{ userId, email, createdAt, isPremium: false }`
+### wrangler.toml
+Required for local KV testing. Local dev uses simulated KV — does NOT write to real Cloudflare KV. Use `--remote` flag for real KV testing locally.
 
-**Learning unlocks:** JWTs, session tokens vs cookies, route guards, auth state in React
+### .gitignore — must include
+```
+*.local
+.wrangler
+node_modules
+dist
+```
 
-### Phase 1 — Storage layer (2–3 weeks)
-**Goal:** Logged-in users can save and retrieve logs across sessions.
-- Create `functions/` folder at project root
-- Add `functions/api/logs.js` — generates R2 presigned upload URLs (PUT), lists user's saved logs (GET), deletes a log (DELETE)
-- Presigned URL flow: React calls function → function generates signed R2 URL → React uploads file directly to R2 → function writes metadata to KV
-- Add a Saved Logs dashboard page (list, delete, rename, click to load)
-- Free tier: session-only (existing behaviour, no changes needed). Premium: persisted.
+### Resend Global Contact Model
+As of Nov 2025 Resend uses global contacts — no audience IDs. Contacts are segmented via Segments. Waitlist flow: create contact → add to segment by segment ID. Two API calls.
 
-**Learning unlocks:** Serverless edge functions, object storage, presigned URL security model, user-scoped data
+### Git on Windows
+Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not errors, safe to ignore.
 
-### Phase 2 — Billing (1–2 weeks)
-**Goal:** Money comes in. Premium flag gets set automatically.
-- Create LemonSqueezy product (Pro monthly £3.49, Pro annual £29.99)
-- Add `/pricing` page with plan cards
-- Add `functions/api/webhooks/lemonsqueezy.js` — listens for `subscription_created`, `subscription_updated`, `subscription_cancelled` events
-- On `subscription_created`: set `isPremium: true` in KV for the user
-- On `subscription_cancelled`: set `isPremium: false`, keep data for 30-day grace period
-- Verify webhook signatures — do not skip this
-- **LTD launch (PayPal, pre-LemonSqueezy):** A simple PayPal.me link or button on the pricing page. First 100 customers pay £49.99, you manually set their KV flag to `isPremium: true`. This is intentionally low-tech — get cash in the door before the automated system is built.
+## Completed Work
 
-**Learning unlocks:** Payment webhook flows, idempotency (why you must check event IDs before acting), subscription state machine
+### Free Tier — Complete ✅
+- Multi-file IRC log parser with auto format detection
+- IRC chat viewer with virtual scrolling
+- Instant and Replay playback modes with speed controls
+- Live names panel with @/+ prefixes and IRC sort order
+- Stats engine — top chatters, hourly activity, word frequency, URLs, time of day
+- Clickable nick profiles with sample lines
+- Three themes — Dark, Light, Classic mIRC chrome
+- Mobile responsive — hamburger nav, Classic desktop-only
+- Export — HTML stats page, PDF via print dialog
+- Session JSON save/load
+- Demo log (one-click load on drop zone)
+- About, Help/FAQ, Links pages
+- Footer with Ko-fi and PayPal donation links
 
-### Phase 3 — Premium features (2–3 weeks)
-**Goal:** Paying users get things they actually paid for.
-- **PDF/PNG export:** `html2canvas` to render the stats page to canvas, `jsPDF` to wrap it. Export button on Stats page, gated by `isPremium`.
-- **Branded share links:** `/s/:username/:slug` routes. When a user saves a log, they get a shareable URL. Public view is read-only, no login required.
-- **Extended stats:** More Recharts visualisations — hourly activity heatmap, top word clouds (consider `d3-cloud`), nick activity over time.
-- **Multi-file session:** Allow dragging in multiple files at once for merged viewing (free tier already supports this but can be surfaced better for premium).
+### SEO & Marketing — Complete ✅
+- Meta tags, OG tags, Twitter card (summary_large_image)
+- OG social preview image (1200×630px)
+- robots.txt and sitemap.xml
+- Google Search Console submitted
+- Reddit posts — r/IRC and r/mIRC
+- Scriptserv.com (sorzkode) linking to IRCReplay
+- 875+ unique visitors, 6.25k requests in first week
 
-**Learning unlocks:** Canvas rendering, client-side PDF generation, URL slug namespacing, richer data vis
+### Premium Infrastructure — In Progress 🔄
+- ✅ Clerk auth — sign in live, sign ups restricted
+- ✅ Cloudflare KV — user records created on sign in
+- ✅ /api/waitlist CF Function — Resend email capture live
+- ✅ /api/user CF Function — KV user record create/fetch live
+- ✅ Pro Coming Soon page with waitlist signup
+- ✅ Pricing page — four plan cards, FAQ
+- ✅ LemonSqueezy products created (3 variants)
+- ⏳ LemonSqueezy identity verification pending
+- ⏳ /api/webhook/lemonsqueezy — blocked on verification
+- ⏳ Checkout URLs need clerk_user_id param wired in
+- ⏳ R2 file storage (Phase 1 — not started)
 
-### Phase 4 — Launch (1 week)
-**Goal:** Tell people it exists. Capture email list. Run LTD.
-- Enforce free tier limits in the UI (soft limits with upgrade prompts, not hard errors)
-- Wire up Resend for subscription confirmation and welcome emails
-- Polish the `/pricing` page
-- Announce to the same communities that drove the Reddit spike
-- Run the lifetime deal (£49.99, first 100 customers, PayPal or LemonSqueezy one-time product)
+## Next Steps (in order)
 
-**Learning unlocks:** Transactional email, rate/usage limiting, indie product launch
+### Immediate — when LemonSqueezy verification comes through
+1. Get API key and add to Cloudflare env vars
+2. Create webhook in LemonSqueezy dashboard → get signing secret
+3. Add `LEMONSQUEEZY_WEBHOOK_SECRET` to Cloudflare env vars
+4. Build `functions/api/webhook/lemonsqueezy.js`
+5. Update Pricing.jsx checkout URLs to pass `clerk_user_id`
+6. Test end to end with test mode payments
 
-## Monetisation Model
+### Phase 1 — R2 Storage (after billing works)
+- Create R2 bucket in Cloudflare
+- Build `functions/api/logs.js` — presigned URL generation, log CRUD
+- Add saved logs dashboard page
+- Gate on `isPremium` check
 
-| Tier | Price | Key limits |
-|------|-------|-----------|
-| Free | £0 forever | Session-only, 1 file at a time, basic stats, no sharing |
-| Pro monthly | £3.49/month | 50 saved logs, PDF export, branded share links, extended stats |
-| Pro annual | £29.99/year (~28% saving) | Same as monthly |
-| Lifetime | £49.99 one-time (launch only, first 100) | Everything in Pro, all future features |
+### Phase 2 — Premium Features
+- Cloud log storage UI
+- Branded share links `/s/:nick/:channel`
+- Extended stats visualisations
+- Enforce free tier limits with upgrade prompts
 
-Revenue targets:
-- 50 lifetime @ £49.99 = £2,500 upfront (LTD launch)
-- 100 monthly @ £3.49 = £349/month recurring
-- 50 annual @ £29.99 = ~£125/month equivalent
+### Phase 3 — Launch
+- Resend subscription confirmation emails
+- Announce to IRC communities
+- Run LTD campaign
 
 ## Commands
 ```bash
-npm run dev      # Local dev server (default port 5173)
-npm run build    # Production build to dist/
-npm run preview  # Preview production build locally
+npm run dev           # Local dev (port 5173) — no CF Functions
+npm run build         # Production build to dist/
+npm run preview       # Preview production build
 
-# When functions/ exists:
-wrangler pages dev dist   # Test CF Pages Functions locally (after build)
+wrangler pages dev dist   # Local dev WITH CF Functions (port 8788)
 ```
 
 ## Deployment
-Push to `main` triggers Cloudflare Pages auto-deploy.
-Build command: `npm run build`
-Output directory: `dist`
-
-When `functions/` folder is added, CF Pages detects and deploys it automatically alongside the static site. No separate wrangler deploy needed.
+Push to `main` → Cloudflare Pages auto-deploys. Build command: `npm run build`. Output: `dist/`. CF Pages detects `functions/` folder automatically.
