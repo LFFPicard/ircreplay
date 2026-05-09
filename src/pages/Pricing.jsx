@@ -1,3 +1,5 @@
+import { useAuth } from '@clerk/react'
+
 const PLANS = [
   {
     id:        'free',
@@ -95,10 +97,11 @@ const CTA_CLASSES = {
 }
 
 function PlanCard({ plan }) {
-  const isHighlight  = plan.highlight
-  const priceColour  = plan.id === 'ltd' ? 'text-yellow-400' : isHighlight ? 'text-green-400' : 'text-white'
-  const borderClass  = isHighlight ? 'bg-green-500/10 border-2 border-green-500/50' : 'bg-gray-800 border border-gray-700'
-  const checkColour  = isHighlight ? 'text-green-400' : 'text-gray-500'
+  const { userId } = useAuth()
+  const isHighlight   = plan.highlight
+  const priceColour   = plan.id === 'ltd' ? 'text-yellow-400' : isHighlight ? 'text-green-400' : 'text-white'
+  const borderClass   = isHighlight ? 'bg-green-500/10 border-2 border-green-500/50' : 'bg-gray-800 border border-gray-700'
+  const checkColour   = isHighlight ? 'text-green-400' : 'text-gray-500'
   const headingColour = isHighlight ? 'text-green-400' : 'text-gray-200'
 
   const handleCheckout = () => {
@@ -106,8 +109,19 @@ function PlanCard({ plan }) {
       window.location.href = '/'
       return
     }
-    // TODO: confirm store slug matches your LemonSqueezy store URL
-    window.open(`https://ircreplay.lemonsqueezy.com/checkout/buy/${plan.variantId}`, '_blank')
+
+    // TODO: Replace PRODUCT_CHECKOUT_SLUG with the actual checkout path
+    // Found in LemonSqueezy dashboard once store is live
+    // Format will be: https://ircreplay.lemonsqueezy.com/checkout/buy/PRODUCT_CHECKOUT_SLUG
+    // Store URL confirmed as: ircreplay.lemonsqueezy.com
+    const baseUrl = 'https://ircreplay.lemonsqueezy.com/checkout/buy/PRODUCT_CHECKOUT_SLUG'
+
+    // Pass Clerk user ID so webhook knows which KV record to update
+    const checkoutUrl = userId
+      ? `${baseUrl}?checkout[custom][clerk_user_id]=${userId}`
+      : baseUrl
+
+    window.open(checkoutUrl, '_blank')
   }
 
   return (
