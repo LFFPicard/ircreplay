@@ -27,18 +27,16 @@ const HEADERS = {
 async function verifySignature(secret, body, signatureHeader) {
   if (!signatureHeader) return false
 
-  // Paddle signature header format: ts=TIMESTAMP;h1=SIGNATURE
-  const parts = {}
-  for (const part of signatureHeader.split(';')) {
-    const [key, value] = part.split('=')
-    parts[key] = value
-  }
+  // Use regex to extract ts and h1 — splitting on = breaks if hash contains =
+  const tsMatch = signatureHeader.match(/ts=(\d+)/)
+  const h1Match = signatureHeader.match(/h1=([a-f0-9]+)/)
 
-  const timestamp = parts['ts']
-  const signature = parts['h1']
-  if (!timestamp || !signature) return false
+  if (!tsMatch || !h1Match) return false
 
-  // Signed payload is: timestamp:body
+  const timestamp = tsMatch[1]
+  const signature = h1Match[1]
+
+  // Signed payload is: timestamp:rawBody
   const signedPayload = `${timestamp}:${body}`
 
   const encoder = new TextEncoder()
