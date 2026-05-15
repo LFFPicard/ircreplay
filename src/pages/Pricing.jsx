@@ -158,6 +158,13 @@ function PlanCard({ plan }) {
 }
 
 function Pricing() {
+  console.log('ENV CHECK:', JSON.stringify({
+    monthly: import.meta.env.VITE_PADDLE_PRICE_MONTHLY,
+    annual:  import.meta.env.VITE_PADDLE_PRICE_ANNUAL,
+    ltd:     import.meta.env.VITE_PADDLE_PRICE_LTD,
+    token:   import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+    mode:    import.meta.env.MODE,
+  }))
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
