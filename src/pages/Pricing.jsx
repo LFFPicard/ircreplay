@@ -9,6 +9,7 @@ const PLANS = [
     highlight: false,
     badge:     null,
     badgeClass: 'bg-green-500 text-black',
+    priceId:   null,
     features: [
       'Full IRC log viewer',
       'Instant and Replay modes',
@@ -20,9 +21,7 @@ const PLANS = [
       'Your logs never leave your device',
     ],
     cta:      'Start for free',
-    ctaLink:  '/',
     ctaStyle: 'border',
-    variantId: null,
   },
   {
     id:        'monthly',
@@ -32,7 +31,7 @@ const PLANS = [
     highlight: true,
     badge:     'Most popular',
     badgeClass: 'bg-green-500 text-black',
-    variantId: 1628924,
+    priceId:   import.meta.env.VITE_PADDLE_PRICE_MONTHLY,
     features: [
       'Everything in Free',
       'Cloud log storage — 50 sessions',
@@ -53,7 +52,7 @@ const PLANS = [
     highlight: false,
     badge:     'Save 28%',
     badgeClass: 'bg-blue-500 text-white',
-    variantId: 1628930,
+    priceId:   import.meta.env.VITE_PADDLE_PRICE_ANNUAL,
     features: [
       'Everything in Pro Monthly',
       'Two months free vs monthly',
@@ -74,7 +73,7 @@ const PLANS = [
     highlight: false,
     badge:     'First 100 only',
     badgeClass: 'bg-yellow-500 text-black',
-    variantId: 1628935,
+    priceId:   import.meta.env.VITE_PADDLE_PRICE_LTD,
     features: [
       'Everything in Pro, forever',
       'No recurring fees ever',
@@ -96,6 +95,15 @@ const CTA_CLASSES = {
   ltd:       'bg-yellow-500 hover:bg-yellow-400 text-black font-bold',
 }
 
+const FAQS = [
+  { q: 'Will the free tier always exist?',         a: 'Yes, absolutely. The core viewer, stats and export will always be free. Pro is for people who want cloud storage and sharing features on top of that.' },
+  { q: 'What happens to my data if I cancel?',     a: 'Your cloud-stored sessions are kept for 30 days after cancellation. You can download them as JSON files at any time before then.' },
+  { q: 'Is the lifetime deal really lifetime?',    a: 'Yes — one payment, all Pro features forever, including everything added in future. Limited to the first 100 customers.' },
+  { q: 'Do my logs get stored on your servers?',   a: 'Free tier — never. Pro tier — only if you explicitly save a session to the cloud. You are always in control.' },
+  { q: 'What payment methods are accepted?',       a: 'All major credit and debit cards via Paddle. They handle VAT automatically so you always see the final price.' },
+  { q: 'Can I switch between monthly and annual?', a: 'Yes — you can upgrade from monthly to annual at any time and get a prorated credit for the remaining monthly period.' },
+]
+
 function PlanCard({ plan }) {
   const { userId } = useAuth()
   const isHighlight   = plan.highlight
@@ -105,34 +113,30 @@ function PlanCard({ plan }) {
   const headingColour = isHighlight ? 'text-green-400' : 'text-gray-200'
 
   const handleCheckout = () => {
-    if (!plan.variantId) {
+    if (!plan.priceId) {
       window.location.href = '/'
       return
     }
-
-    // TODO: Replace PRODUCT_CHECKOUT_SLUG with the actual checkout path
-    // Found in LemonSqueezy dashboard once store is live
-    // Format will be: https://ircreplay.lemonsqueezy.com/checkout/buy/PRODUCT_CHECKOUT_SLUG
-    // Store URL confirmed as: ircreplay.lemonsqueezy.com
-    const baseUrl = 'https://ircreplay.lemonsqueezy.com/checkout/buy/PRODUCT_CHECKOUT_SLUG'
-
-    // Pass Clerk user ID so webhook knows which KV record to update
-    const checkoutUrl = userId
-      ? `${baseUrl}?checkout[custom][clerk_user_id]=${userId}`
-      : baseUrl
-
-    window.open(checkoutUrl, '_blank')
+    if (!window.Paddle) {
+      console.error('Paddle.js not loaded')
+      return
+    }
+    // TODO: Remove this line when going live — sandbox only
+    window.Paddle.Environment.set('sandbox')
+    window.Paddle.Initialize({
+      token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+    })
+    window.Paddle.Checkout.open({
+      items: [{ priceId: plan.priceId, quantity: 1 }],
+      customData: { clerk_user_id: userId || null },
+    })
   }
 
   return (
     <div className={`relative flex flex-col rounded-xl p-6 space-y-4 ${borderClass}`}>
-
       {plan.badge && (
-        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap ${plan.badgeClass}`}>
-          {plan.badge}
-        </div>
+        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap ${plan.badgeClass}`}>{plan.badge}</div>
       )}
-
       <div>
         <h3 className={`font-mono font-bold text-lg ${headingColour}`}>{plan.name}</h3>
         <div className="flex items-baseline gap-2 mt-1">
@@ -140,7 +144,6 @@ function PlanCard({ plan }) {
           <span className="text-gray-500 text-sm">{plan.period}</span>
         </div>
       </div>
-
       <ul className="space-y-2 flex-1">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm">
@@ -149,21 +152,10 @@ function PlanCard({ plan }) {
           </li>
         ))}
       </ul>
-
       <button onClick={handleCheckout} className={`w-full py-2.5 rounded-lg text-sm transition-colors ${CTA_CLASSES[plan.ctaStyle]}`}>{plan.cta}</button>
-
     </div>
   )
 }
-
-const FAQS = [
-  { q: 'Will the free tier always exist?',           a: 'Yes, absolutely. The core viewer, stats and export will always be free. Pro is for people who want cloud storage and sharing features on top of that.' },
-  { q: 'What happens to my data if I cancel?',       a: 'Your cloud-stored sessions are kept for 30 days after cancellation. You can download them as JSON files at any time before then.' },
-  { q: 'Is the lifetime deal really lifetime?',      a: 'Yes — one payment, all Pro features forever, including everything added in future. Limited to the first 100 customers.' },
-  { q: 'Do my logs get stored on your servers?',     a: 'Free tier — never. Pro tier — only if you explicitly save a session to the cloud. You are always in control.' },
-  { q: 'What payment methods are accepted?',         a: 'All major credit and debit cards via LemonSqueezy. They handle VAT automatically so you always see the final price.' },
-  { q: 'Can I switch between monthly and annual?',   a: 'Yes — you can upgrade from monthly to annual at any time and get a prorated credit for the remaining monthly period.' },
-]
 
 function Pricing() {
   return (
@@ -204,7 +196,7 @@ function Pricing() {
         </div>
 
         <div className="border-t border-gray-700 pt-6">
-          <p className="text-gray-600 font-mono text-xs text-center">&copy; 2026 IRCReplay.app &mdash; Payments handled securely by LemonSqueezy</p>
+          <p className="text-gray-600 font-mono text-xs text-center">&copy; 2026 IRCReplay.app &mdash; Payments handled securely by Paddle</p>
         </div>
 
       </div>
