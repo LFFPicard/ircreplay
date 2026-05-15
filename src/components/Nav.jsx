@@ -28,7 +28,6 @@ const NAV_LINKS = [
 ]
 
 function Nav({ isMobile }) {
-  const { isPremium } = useUser()
   const { theme, setTheme }   = useTheme()
   const { session, stats }    = useSession()
   const navigate              = useNavigate()
