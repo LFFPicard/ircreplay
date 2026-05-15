@@ -188,7 +188,7 @@ export async function onRequestPost(context) {
   try {
     if      (eventType === 'subscription.created')   await handleSubscriptionCreated(data, kv)
     else if (eventType === 'subscription.updated')   await handleSubscriptionUpdated(data, kv)
-    else if (eventType === 'subscription.canceled')  await handleSubscriptionCancelled(data, kv)
+    else if (eventType === 'subscription.canceled' || eventType === 'subscription.cancelled')  await handleSubscriptionCancelled(data, kv)
     else if (eventType === 'subscription.past_due')  await handleSubscriptionCancelled(data, kv)
     else if (eventType === 'transaction.completed')  await handleTransactionCompleted(data, kv, ltdPriceId)
     else console.log(`Unhandled event: ${eventType}`)
