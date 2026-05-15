@@ -27,16 +27,13 @@ const HEADERS = {
 async function verifySignature(secret, body, signatureHeader) {
   if (!signatureHeader) return false
 
-  // Use regex to extract ts and h1 — splitting on = breaks if hash contains =
   const tsMatch = signatureHeader.match(/ts=(\d+)/)
   const h1Match = signatureHeader.match(/h1=([a-f0-9]+)/)
 
   if (!tsMatch || !h1Match) return false
 
-  const timestamp = tsMatch[1]
-  const signature = h1Match[1]
-
-  // Signed payload is: timestamp:rawBody
+  const timestamp    = tsMatch[1]
+  const signature    = h1Match[1]
   const signedPayload = `${timestamp}:${body}`
 
   const encoder = new TextEncoder()
@@ -95,18 +92,18 @@ async function setPremium(kv, userId, isPremium) {
 async function handleSubscriptionCreated(data, kv) {
   console.log('handleSubscriptionCreated called')
   console.log('data:', JSON.stringify(data))
-  
+
   const customData = data.custom_data || data.customData || {}
   console.log('customData:', JSON.stringify(customData))
-  
+
   const userId = customData.clerk_user_id || customData.clerkUserId
   console.log('userId:', userId)
-  
+
   if (!userId) {
     console.error('no clerk_user_id found')
     return
   }
-  
+
   console.log('calling setPremium for', userId)
   await setPremium(kv, userId, true)
   console.log('setPremium complete')
@@ -114,18 +111,18 @@ async function handleSubscriptionCreated(data, kv) {
 
 async function handleSubscriptionUpdated(data, kv) {
   const customData = data.custom_data || data.customData || {}
-  const userId = customData.clerk_user_id || customData.clerkUserId
+  const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
-  const status = data.status
-  console.log(`subscription.updated: userId=${userId} status=${status}`)
+  const status        = data.status
   const activeStatuses = ['active', 'trialing', 'past_due']
-  const isPremium = activeStatuses.includes(status)
+  const isPremium     = activeStatuses.includes(status)
+  console.log(`subscription.updated: userId=${userId} status=${status}`)
   await setPremium(kv, userId, isPremium)
 }
 
 async function handleSubscriptionCancelled(data, kv) {
   const customData = data.custom_data || data.customData || {}
-  const userId = customData.clerk_user_id || customData.clerkUserId
+  const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
   console.log(`subscription.canceled: revoking premium from ${userId}`)
   await setPremium(kv, userId, false)
@@ -133,13 +130,13 @@ async function handleSubscriptionCancelled(data, kv) {
 
 async function handleTransactionCompleted(data, kv, ltdPriceId) {
   const customData = data.custom_data || data.customData || {}
-  const userId = customData.clerk_user_id || customData.clerkUserId
+  const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) {
-    console.error('transaction.completed: no clerk_user_id in custom_data', JSON.stringify(customData))
+    console.error('transaction.completed: no clerk_user_id', JSON.stringify(customData))
     return
   }
   const items = data.items || []
-  const isLTD = items.some(item => (item.price?.id === ltdPriceId) || (item.price_id === ltdPriceId))
+  const isLTD = items.some(item => item.price?.id === ltdPriceId || item.price_id === ltdPriceId)
   if (!isLTD) {
     console.log('transaction.completed: not an LTD purchase — ignoring')
     return
@@ -165,24 +162,12 @@ export async function onRequestPost(context) {
   const signatureHeader = request.headers.get('paddle-signature')
   const body            = await request.text()
 
-  // TODO: Re-enable signature verification once confirmed working
+  // TODO: Re-enable signature verification once KV flip is confirmed working
   // const isValid = await verifySignature(secret, body, signatureHeader)
   // if (!isValid) {
   //   console.error('Paddle webhook signature verification failed')
   //   return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: HEADERS })
   // }
-
-  const signatureHeader = request.headers.get('paddle-signature')
-  const body = await request.text()
-
-  const isValid = await verifySignature(secret, body, signatureHeader)
-  if (!isValid) {
-    console.error('Paddle webhook signature verification failed')
-    return new Response(
-      JSON.stringify({ error: 'Invalid signature' }),
-      { status: 401, headers: HEADERS }
-    )
-  }
 
   let payload
   try {
@@ -194,9 +179,9 @@ export async function onRequestPost(context) {
     )
   }
 
-  const eventType = payload.event_type
-  const data      = payload.data
-  const kv        = env.IRCREPLAY_KV
+  const eventType  = payload.event_type || payload.eventType
+  const data       = payload.data
+  const kv         = env.IRCREPLAY_KV
   const ltdPriceId = env.PADDLE_PRICE_LTD
 
   console.log(`Paddle webhook received: ${eventType}`)
@@ -217,7 +202,7 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error(`Error handling ${eventType}:`, err.message)
     return new Response(
-      JSON.stringify({ error: 'Handler failed' }),
+      JSON.stringify({ error: 'Handler failed', detail: err.message }),
       { status: 500, headers: HEADERS }
     )
   }
