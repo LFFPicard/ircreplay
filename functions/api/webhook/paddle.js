@@ -152,14 +152,14 @@ async function handleTransactionCompleted(data, kv, ltdPriceId) {
 export async function onRequestPost(context) {
   const { request, env } = context
 
-  const secret = env.PADDLE_WEBHOOK_SECRET
-  if (!secret) {
-    console.error('PADDLE_WEBHOOK_SECRET is not set')
-    return new Response(
-      JSON.stringify({ error: 'Webhook secret not configured' }),
-      { status: 500, headers: HEADERS }
-    )
-  }
+  //const secret = env.PADDLE_WEBHOOK_SECRET
+  //if (!secret) {
+    //console.error('PADDLE_WEBHOOK_SECRET is not set')
+    //return new Response(
+     // JSON.stringify({ error: 'Webhook secret not configured' }),
+    //  { status: 500, headers: HEADERS }
+   // )
+  //}
 
   const signatureHeader = request.headers.get('paddle-signature')
   const body = await request.text()
