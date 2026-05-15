@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/react'
+import { useAuth, useClerk } from '@clerk/react'
 import { useEffect } from 'react'
 
 const PLANS = [
@@ -94,6 +94,7 @@ const CTA_CLASSES = {
   secondary: 'bg-gray-700 hover:bg-gray-600 text-white font-semibold',
   border:    'border border-gray-600 hover:border-gray-400 text-gray-300 font-semibold',
   ltd:       'bg-yellow-500 hover:bg-yellow-400 text-black font-bold',
+  signin:    'bg-gray-600 hover:bg-gray-500 text-white font-semibold',
 }
 
 const FAQS = [
@@ -106,29 +107,43 @@ const FAQS = [
 ]
 
 function PlanCard({ plan }) {
-  const { userId } = useAuth()
+  const { userId }     = useAuth()
+  const { openSignIn } = useClerk()
+
   const isHighlight   = plan.highlight
+  const isFree        = !plan.priceId
+  const isSignedIn    = !!userId
   const priceColour   = plan.id === 'ltd' ? 'text-yellow-400' : isHighlight ? 'text-green-400' : 'text-white'
   const borderClass   = isHighlight ? 'bg-green-500/10 border-2 border-green-500/50' : 'bg-gray-800 border border-gray-700'
   const checkColour   = isHighlight ? 'text-green-400' : 'text-gray-500'
   const headingColour = isHighlight ? 'text-green-400' : 'text-gray-200'
 
+  // Button label and style changes based on auth state
+  const btnLabel = isFree ? plan.cta : isSignedIn ? plan.cta : 'Sign in to purchase'
+  const btnStyle = isFree ? plan.ctaStyle : isSignedIn ? plan.ctaStyle : 'signin'
+
   const handleCheckout = () => {
-    if (!plan.priceId) {
+    // Free plan — go to viewer
+    if (isFree) {
       window.location.href = '/'
       return
     }
+    // Not signed in — open Clerk sign in modal
+    if (!isSignedIn) {
+      openSignIn()
+      return
+    }
+    // Paddle not loaded
     if (!window.Paddle) {
       console.error('Paddle.js not loaded')
       return
     }
-    // Paddle is already initialised via useEffect in Pricing
-    // Just open the checkout overlay
+    // Open Paddle checkout overlay
     window.Paddle.Checkout.open({
       items: [{ priceId: plan.priceId, quantity: 1 }],
-      customData: { clerk_user_id: userId || null },
+      customData: { clerk_user_id: userId },
       eventCallback: (event) => {
-        console.log('Paddle event:', event.name, event)
+        console.log('Paddle event:', event.name)
       },
     })
   }
@@ -153,7 +168,7 @@ function PlanCard({ plan }) {
           </li>
         ))}
       </ul>
-      <button onClick={handleCheckout} className={`w-full py-2.5 rounded-lg text-sm transition-colors ${CTA_CLASSES[plan.ctaStyle]}`}>{plan.cta}</button>
+      <button onClick={handleCheckout} className={`w-full py-2.5 rounded-lg text-sm transition-colors ${CTA_CLASSES[btnStyle]}`}>{btnLabel}</button>
     </div>
   )
 }

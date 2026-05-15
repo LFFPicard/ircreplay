@@ -93,9 +93,10 @@ async function setPremium(kv, userId, isPremium) {
 // ─────────────────────────────────────────────
 
 async function handleSubscriptionCreated(data, kv) {
-  const userId = data.custom_data?.clerk_user_id
+  const customData = data.custom_data || data.customData || {}
+  const userId = customData.clerk_user_id || customData.clerkUserId
   if (!userId) {
-    console.error('subscription.created: no clerk_user_id in custom_data')
+    console.error('subscription.created: no clerk_user_id in custom_data', JSON.stringify(customData))
     return
   }
   console.log(`subscription.created: granting premium to ${userId}`)
@@ -103,46 +104,39 @@ async function handleSubscriptionCreated(data, kv) {
 }
 
 async function handleSubscriptionUpdated(data, kv) {
-  const userId = data.custom_data?.clerk_user_id
+  const customData = data.custom_data || data.customData || {}
+  const userId = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
-
   const status = data.status
   console.log(`subscription.updated: userId=${userId} status=${status}`)
-
   const activeStatuses = ['active', 'trialing', 'past_due']
   const isPremium = activeStatuses.includes(status)
   await setPremium(kv, userId, isPremium)
 }
 
 async function handleSubscriptionCancelled(data, kv) {
-  const userId = data.custom_data?.clerk_user_id
+  const customData = data.custom_data || data.customData || {}
+  const userId = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
   console.log(`subscription.canceled: revoking premium from ${userId}`)
   await setPremium(kv, userId, false)
 }
 
 async function handleTransactionCompleted(data, kv, ltdPriceId) {
-  // One-time purchase — used for the Lifetime Deal
-  const userId = data.custom_data?.clerk_user_id
+  const customData = data.custom_data || data.customData || {}
+  const userId = customData.clerk_user_id || customData.clerkUserId
   if (!userId) {
-    console.error('transaction.completed: no clerk_user_id in custom_data')
+    console.error('transaction.completed: no clerk_user_id in custom_data', JSON.stringify(customData))
     return
   }
-
-  // Check if this transaction contains the LTD price
   const items = data.items || []
-  const isLTD = items.some(item => item.price?.id === ltdPriceId)
-
+  const isLTD = items.some(item => (item.price?.id === ltdPriceId) || (item.price_id === ltdPriceId))
   if (!isLTD) {
     console.log('transaction.completed: not an LTD purchase — ignoring')
     return
   }
-
   console.log(`transaction.completed: granting lifetime premium to ${userId}`)
-  const user = await getUser(kv, userId) || {
-    userId,
-    createdAt: new Date().toISOString(),
-  }
+  const user = await getUser(kv, userId) || { userId, createdAt: new Date().toISOString() }
   await setUser(kv, userId, {
     ...user,
     isPremium:    true,
