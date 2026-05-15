@@ -162,12 +162,11 @@ export async function onRequestPost(context) {
   const signatureHeader = request.headers.get('paddle-signature')
   const body            = await request.text()
 
-  // TODO: Re-enable signature verification once KV flip is confirmed working
-  // const isValid = await verifySignature(secret, body, signatureHeader)
-  // if (!isValid) {
-  //   console.error('Paddle webhook signature verification failed')
-  //   return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: HEADERS })
-  // }
+   const isValid = await verifySignature(secret, body, signatureHeader)
+   if (!isValid) {
+     console.error('Paddle webhook signature verification failed')
+     return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: HEADERS })
+   }
 
   let payload
   try {
