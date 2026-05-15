@@ -1,4 +1,5 @@
 import { useAuth } from '@clerk/react'
+import { useEffect } from 'react'
 
 const PLANS = [
   {
@@ -121,14 +122,14 @@ function PlanCard({ plan }) {
       console.error('Paddle.js not loaded')
       return
     }
-    // TODO: Remove this line when going live — sandbox only
-    window.Paddle.Environment.set('sandbox')
-    window.Paddle.Initialize({
-      token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-    })
+    // Paddle is already initialised via useEffect in Pricing
+    // Just open the checkout overlay
     window.Paddle.Checkout.open({
       items: [{ priceId: plan.priceId, quantity: 1 }],
       customData: { clerk_user_id: userId || null },
+      eventCallback: (event) => {
+        console.log('Paddle event:', event.name, event)
+      },
     })
   }
 
@@ -158,13 +159,29 @@ function PlanCard({ plan }) {
 }
 
 function Pricing() {
-  console.log('ENV CHECK:', JSON.stringify({
-    monthly: import.meta.env.VITE_PADDLE_PRICE_MONTHLY,
-    annual:  import.meta.env.VITE_PADDLE_PRICE_ANNUAL,
-    ltd:     import.meta.env.VITE_PADDLE_PRICE_LTD,
-    token:   import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-    mode:    import.meta.env.MODE,
-  }))
+  useEffect(() => {
+    const initPaddle = () => {
+      if (!window.Paddle) return
+      // TODO: Remove Environment.set when going live — sandbox only
+      window.Paddle.Environment.set('sandbox')
+      window.Paddle.Initialize({
+        token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+        eventCallback: (event) => {
+          console.log('Paddle init event:', event.name)
+        },
+      })
+    }
+
+    if (window.Paddle) {
+      initPaddle()
+    } else {
+      const script = document.querySelector('script[src*="paddle.com"]')
+      if (script) {
+        script.addEventListener('load', initPaddle)
+      }
+    }
+  }, [])
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
