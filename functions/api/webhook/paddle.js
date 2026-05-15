@@ -161,14 +161,16 @@ async function handleTransactionCompleted(data, kv, ltdPriceId) {
 export async function onRequestPost(context) {
   const { request, env } = context
 
-  //const secret = env.PADDLE_WEBHOOK_SECRET
-  //if (!secret) {
-    //console.error('PADDLE_WEBHOOK_SECRET is not set')
-    //return new Response(
-     // JSON.stringify({ error: 'Webhook secret not configured' }),
-    //  { status: 500, headers: HEADERS }
-   // )
-  //}
+  const secret          = env.PADDLE_WEBHOOK_SECRET
+  const signatureHeader = request.headers.get('paddle-signature')
+  const body            = await request.text()
+
+  // TODO: Re-enable signature verification once confirmed working
+  // const isValid = await verifySignature(secret, body, signatureHeader)
+  // if (!isValid) {
+  //   console.error('Paddle webhook signature verification failed')
+  //   return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: HEADERS })
+  // }
 
   const signatureHeader = request.headers.get('paddle-signature')
   const body = await request.text()
