@@ -93,14 +93,23 @@ async function setPremium(kv, userId, isPremium) {
 // ─────────────────────────────────────────────
 
 async function handleSubscriptionCreated(data, kv) {
+  console.log('handleSubscriptionCreated called')
+  console.log('data:', JSON.stringify(data))
+  
   const customData = data.custom_data || data.customData || {}
+  console.log('customData:', JSON.stringify(customData))
+  
   const userId = customData.clerk_user_id || customData.clerkUserId
+  console.log('userId:', userId)
+  
   if (!userId) {
-    console.error('subscription.created: no clerk_user_id in custom_data', JSON.stringify(customData))
+    console.error('no clerk_user_id found')
     return
   }
-  console.log(`subscription.created: granting premium to ${userId}`)
+  
+  console.log('calling setPremium for', userId)
   await setPremium(kv, userId, true)
+  console.log('setPremium complete')
 }
 
 async function handleSubscriptionUpdated(data, kv) {
