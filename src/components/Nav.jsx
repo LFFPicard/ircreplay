@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useSession } from '../context/SessionContext'
 import { generateStatsHtml, downloadFile } from '../lib/exportHtml'
 import { saveSession } from '../lib/exportSession'
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
+import { Show, SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/react'
 import { useUser } from '../context/UserContext'
 
 const THEMES_DESKTOP = [
@@ -34,6 +34,8 @@ function Nav({ isMobile }) {
   const navigate              = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [exportMode, setExportMode] = useState('html')
+  const { userId }        = useAuth()
+  const { isPremium }     = useUser()
 
   const canExport = session && stats
   const canSave   = !!session
