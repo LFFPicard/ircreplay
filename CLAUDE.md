@@ -3,7 +3,7 @@
 ## Project Overview
 Browser-based IRC log viewer and statistics generator. Users drag-and-drop IRC log files, view them in a themed chat interface, and explore channel statistics. Fully client-side for the free tier — no server, no database.
 
-A premium tier is in active build. Auth and KV storage are live. Billing is blocked on LemonSqueezy identity verification.
+A premium tier is in active build. Auth, KV storage, and billing pipeline are all live in sandbox. Next step is R2 storage for cloud log saving.
 
 ## Stack
 
@@ -17,28 +17,29 @@ A premium tier is in active build. Auth and KV storage are live. Billing is bloc
 - **Hosting:** Cloudflare Pages (auto-deploys from GitHub push to `main`)
 - **Functions:** Cloudflare Pages Functions (`/functions` folder at project root)
 - **KV:** Cloudflare KV — namespace `IRCREPLAY_KV`, bound in CF Pages settings
+- **Billing:** Paddle (sandbox) — overlay checkout via Paddle.js, webhook handler live
 - **Email:** Resend — waitlist signups via `/api/waitlist` function
 - **Repo:** github.com/LFFPicard/ircreplay (public)
 - **Domain:** ircreplay.app
 
 ### Planned additions (premium tier)
 - **File storage:** Cloudflare R2 — zero egress fees, native to CF Pages. Log files uploaded via presigned URLs.
-- **Billing:** LemonSqueezy — Merchant of Record, handles EU VAT. NOT Stripe (tax complexity).
 - **Transactional email:** Resend — subscription confirmations and welcome emails.
 
 ## Environment Variables (Cloudflare Pages + .env.local)
 
 | Variable | Used in | Notes |
 |---|---|---|
-| `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk publishable key — safe to expose |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk dev key — swap for prod key at launch |
 | `RESEND_API_KEY` | CF Function | Resend API key for waitlist |
 | `RESEND_SEGMENT_ID` | CF Function | Resend segment ID for waitlist |
-| `LEMONSQUEEZY_VARIANT_MONTHLY` | Frontend/Function | Variant ID 1628924 |
-| `LEMONSQUEEZY_VARIANT_ANNUAL` | Frontend/Function | Variant ID 1628930 |
-| `LEMONSQUEEZY_VARIANT_LTD` | Frontend/Function | Variant ID 1628935 |
-| `LEMONSQUEEZY_STORE_ID` | Function | Store ID (no # prefix) |
-| `LEMONSQUEEZY_API_KEY` | Function | Awaiting identity verification |
-| `LEMONSQUEEZY_WEBHOOK_SECRET` | Function | Generated when webhook is created |
+| `VITE_PADDLE_CLIENT_TOKEN` | Frontend | Paddle.js client token — starts with `test_` in sandbox |
+| `VITE_PADDLE_PRICE_MONTHLY` | Frontend | Price ID `pri_01krp43ygghhsdtbhr2964yqv3` |
+| `VITE_PADDLE_PRICE_ANNUAL` | Frontend | Price ID `pri_01krp47c4gm27t2py6adrj2nag` |
+| `VITE_PADDLE_PRICE_LTD` | Frontend | Price ID `pri_01krp485agbrm8c4ghv8avbvwf` |
+| `PADDLE_API_KEY` | CF Function | Paddle sandbox API key |
+| `PADDLE_WEBHOOK_SECRET` | CF Function | Full secret from Paddle notification destination — starts with `pdl_ntfset_` |
+| `PADDLE_PRICE_LTD` | CF Function | Same LTD price ID — used by webhook to identify LTD purchases |
 
 ## Architecture
 
@@ -52,10 +53,10 @@ A premium tier is in active build. Auth and KV storage are live. Billing is bloc
 ### Premium tier (in build)
 - CF Pages Functions provide thin API at `/functions/api/`
 - KV stores user records keyed by Clerk user ID: `user:{userId}`
-- User record shape: `{ userId, createdAt, isPremium, premiumSince }`
+- User record shape: `{ userId, createdAt, isPremium, premiumSince, isLifetime? }`
+- Paddle webhook flips `isPremium` flag in KV on subscription events
+- All premium features will gate on `isPremium` from KV
 - R2 bucket scoped per user ID (not yet built)
-- LemonSqueezy webhook flips `isPremium` flag in KV
-- All premium features gate on `isPremium` from KV
 
 ## Key Directories
 ```
@@ -70,20 +71,56 @@ src/
 
 functions/
 └── api/
-    ├── waitlist.js       # Resend email capture — LIVE
-    ├── user.js           # KV user record create/fetch — LIVE
+    ├── waitlist.js         # Resend email capture — LIVE
+    ├── user.js             # KV user record create/fetch — LIVE
     └── webhook/
-        └── lemonsqueezy.js  # TO BUILD — awaiting LS verification
+        └── paddle.js       # Paddle webhook handler — LIVE (sandbox)
 ```
 
 ## Clerk Auth — IMPORTANT
 - Package: `@clerk/react` v6 (Core 3) — NOT `@clerk/clerk-react`
 - Import path matters — wrong package = missing exports error
-- v6 uses `<Show when="signed-out">` / `<Show when="signed-in">` NOT `<SignedIn>` / `<SignedOut>` (those are deprecated in Core 3)
+- v6 uses `<Show when="signed-out">` / `<Show when="signed-in">` NOT `<SignedIn>` / `<SignedOut>` (deprecated in Core 3)
+- Also exports `useAuth` and `useClerk` for hooks-based auth
 - `ClerkProvider` wraps the app in `main.jsx` — NOT in `App.jsx`
 - Sign ups are RESTRICTED in Clerk dashboard — invite only until Pro launches
 - Sign Up buttons are commented out in Nav.jsx ready to uncomment at launch
+- Currently using DEV keys — swap for production keys before launch
 - `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local` for local dev + Cloudflare env vars for production
+
+## Paddle Billing — IMPORTANT
+
+### Current state
+- Sandbox mode — no real money
+- Overlay checkout via Paddle.js loaded in `index.html`
+- Paddle initialised in `useEffect` in `Pricing.jsx` — called ONCE on page load, not on button click
+- `Environment.set('sandbox')` must be called BEFORE `Initialize()`
+- Checkout passes `clerk_user_id` via `customData`
+
+### Paddle camelCase gotcha
+Paddle converts `custom_data` keys to camelCase in webhook payloads:
+- You send: `{ clerk_user_id: 'user_xxx' }`
+- Webhook receives: `{ clerkUserId: 'user_xxx' }`
+- Always handle both: `customData.clerk_user_id || customData.clerkUserId`
+
+### Event type gotcha
+Paddle uses British spelling in some events:
+- `subscription.cancelled` (double l) — British
+- `subscription.canceled` (single l) — American
+- Always handle both in the router
+
+### Webhook secret
+The webhook secret is NOT the notification ID (`ntfset_xxx`).
+The full secret is found by editing the notification destination in Paddle dashboard.
+It starts with `pdl_ntfset_` and is much longer — includes a random signing key after the last underscore.
+
+### Going live checklist
+1. Remove `Paddle.Environment.set('sandbox')` from Pricing.jsx
+2. Swap all `VITE_PADDLE_*` env vars for live price IDs
+3. Swap `VITE_PADDLE_CLIENT_TOKEN` for live client token (starts with `live_`)
+4. Swap `PADDLE_API_KEY` and `PADDLE_WEBHOOK_SECRET` for live values
+5. Create new live webhook endpoint in Paddle pointing to same URL
+6. Switch Clerk from dev to production keys
 
 ## Web Workers
 - Workers live in `src/workers/`, import from `../lib/` (relative path)
@@ -96,46 +133,37 @@ functions/
 
 ## Parser
 - Auto-detects log format via `detectFormat()` — inspects first 30 lines
-- Format A: mIRC binary (real `\x03` control codes) — your personal logs
+- Format A: mIRC binary (real `\x03` control codes)
 - Format B: mIRC plain text (no control codes) — mIRCStats sample format
+- Format C: XChat/HexChat — `Mon DD HH:MM:SS` timestamp, tab-separated, single `*` events
 - `stripControlCodes` removes IRC formatting bytes
 - `extractColour` / `MIRC_COLOURS` handle mIRC 16-colour palette
 - `sortLogFiles` merges and chronologically orders multiple log files
-- Shared `parseSystemBody()` handles `***` event lines across all formats
+- Shared `parseSystemBody()` handles `***` event lines for mIRC formats
+- XChat mode events use natural language ("gives channel operator status to") — translated to standard `+o/-o` format
 
 ## Supported Log Formats
 | Format | Status |
 |---|---|
 | mIRC default (binary control codes) | ✅ Live |
 | mIRC plain text | ✅ Live |
+| XChat / HexChat | ✅ Live |
 | Multi-file merge with date ordering | ✅ Live |
-| irssi | 🔄 Planned |
-| XChat / HexChat | 🔄 Planned |
+| irssi | 🔄 Planned — VM idling to collect logs |
 | ZNC bouncer | 🔄 Planned |
 
 ## Themes
 - Dark, Light, Classic — switched via ThemeContext
 - Classic is desktop-only — auto-switches to Dark on mobile (screen width < 768px)
 - Classic uses Fixedsys Excelsior font from CDN, falls back to Courier New
-- CSS overrides per theme class in `index.css` — Tailwind arbitrary values not used for theme colours
-
-## LemonSqueezy Products
-| Product | Variant ID | Type |
-|---|---|---|
-| Pro Monthly | 1628924 | Subscription |
-| Pro Annual | 1628930 | Subscription |
-| Lifetime Deal | 1628935 | One-time |
-
-Checkout URL format: `https://ircreplay.lemonsqueezy.com/checkout/buy/{variantId}?checkout[custom][clerk_user_id]={userId}`
-
-The `clerk_user_id` custom param is how the webhook knows which KV record to update.
+- CSS overrides per theme class in `index.css`
 
 ## Known Gotchas — IMPORTANT
 
 ### OXC JSX Parser (most common issue)
 Vite 6 uses OXC which is stricter than previous parsers. These ALL cause build errors:
 - Comparison operators (`<`, `>`) inline in JSX className strings
-- Ternary operators inline in JSX className strings  
+- Ternary operators inline in JSX className strings
 - Multi-line JSX attributes with `>` on their own line
 - Special characters (`©`, `—`, emojis) directly in JSX text
 - JSX comments `{/* */}` that accidentally swallow closing tags
@@ -153,7 +181,7 @@ return <div className={colour}>
 Use HTML entities for special chars: `&copy;` `&mdash;` `&middot;` `&#9889;` etc.
 
 ### Worker Import Paths
-Workers in `src/workers/` import from `src/lib/` — use `../lib/` prefix. Wrong path = MIME type error (Vite returns 404 HTML, browser complains about MIME type instead of saying file not found).
+Workers in `src/workers/` import from `src/lib/` — use `../lib/` prefix. Wrong path = MIME type error.
 
 ### CF Pages Functions Local Testing
 `npm run dev` does NOT run CF Pages Functions. To test functions locally:
@@ -183,7 +211,7 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 ## Completed Work
 
 ### Free Tier — Complete ✅
-- Multi-file IRC log parser with auto format detection
+- Multi-file IRC log parser with auto format detection (mIRC binary, plain text, XChat)
 - IRC chat viewer with virtual scrolling
 - Instant and Replay playback modes with speed controls
 - Live names panel with @/+ prefixes and IRC sort order
@@ -194,63 +222,61 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 - Export — HTML stats page, PDF via print dialog
 - Session JSON save/load
 - Demo log (one-click load on drop zone)
-- About, Help/FAQ, Links pages
+- About, Help/FAQ, Links, Pricing, Pro Coming Soon pages
 - Footer with Ko-fi and PayPal donation links
 
 ### SEO & Marketing — Complete ✅
 - Meta tags, OG tags, Twitter card (summary_large_image)
 - OG social preview image (1200×630px)
+- LemonSqueezy store assets (logo 160x160, favicon 32x32, header 1600x300)
 - robots.txt and sitemap.xml
 - Google Search Console submitted
 - Reddit posts — r/IRC and r/mIRC
 - Scriptserv.com (sorzkode) linking to IRCReplay
-- 875+ unique visitors, 6.25k requests in first week
+- 875+ unique visitors in first week
 
-### Premium Infrastructure — In Progress 🔄
-- ✅ Clerk auth — sign in live, sign ups restricted
+### Premium Infrastructure — Billing Complete ✅
+- ✅ Clerk auth — sign in live, sign ups restricted, Google SSO working
 - ✅ Cloudflare KV — user records created on sign in
 - ✅ /api/waitlist CF Function — Resend email capture live
 - ✅ /api/user CF Function — KV user record create/fetch live
-- ✅ Pro Coming Soon page with waitlist signup
-- ✅ Pricing page — four plan cards, FAQ
-- ✅ LemonSqueezy products created (3 variants)
-- ⏳ LemonSqueezy identity verification pending
-- ⏳ /api/webhook/lemonsqueezy — blocked on verification
-- ⏳ Checkout URLs need clerk_user_id param wired in
-- ⏳ R2 file storage (Phase 1 — not started)
+- ✅ Paddle sandbox — products created (monthly, annual, LTD)
+- ✅ Paddle.js overlay checkout — working end to end
+- ✅ /api/webhook/paddle — signature verification working
+- ✅ subscription.created → isPremium: true confirmed
+- ✅ subscription.cancelled → isPremium: false confirmed
+- ✅ Sign in guard on checkout — prompts Clerk modal if not signed in
+- ⏳ R2 file storage — next up
+- ⏳ Switch to live Paddle + Clerk credentials — after Pro features built
 
 ## Next Steps (in order)
 
-### Immediate — when LemonSqueezy verification comes through
-1. Get API key and add to Cloudflare env vars
-2. Create webhook in LemonSqueezy dashboard → get signing secret
-3. Add `LEMONSQUEEZY_WEBHOOK_SECRET` to Cloudflare env vars
-4. Build `functions/api/webhook/lemonsqueezy.js`
-5. Update Pricing.jsx checkout URLs to pass `clerk_user_id`
-6. Test end to end with test mode payments
-
-### Phase 1 — R2 Storage (after billing works)
-- Create R2 bucket in Cloudflare
+### Phase 1 — R2 Storage
+- Create R2 bucket in Cloudflare dashboard
 - Build `functions/api/logs.js` — presigned URL generation, log CRUD
-- Add saved logs dashboard page
-- Gate on `isPremium` check
+- Add saved logs dashboard page (list, load, delete)
+- Gate on `isPremium` check from KV
 
 ### Phase 2 — Premium Features
-- Cloud log storage UI
+- Cloud log storage UI wired to R2
 - Branded share links `/s/:nick/:channel`
 - Extended stats visualisations
 - Enforce free tier limits with upgrade prompts
 
 ### Phase 3 — Launch
+- Remove debug console.logs from webhook handler
+- Switch Paddle sandbox → live credentials
+- Switch Clerk dev → production keys
+- Uncomment Sign Up buttons in Nav.jsx
 - Resend subscription confirmation emails
 - Announce to IRC communities
 - Run LTD campaign
 
 ## Commands
 ```bash
-npm run dev           # Local dev (port 5173) — no CF Functions
-npm run build         # Production build to dist/
-npm run preview       # Preview production build
+npm run dev               # Local dev (port 5173) — no CF Functions
+npm run build             # Production build to dist/
+npm run preview           # Preview production build
 
 wrangler pages dev dist   # Local dev WITH CF Functions (port 8788)
 ```

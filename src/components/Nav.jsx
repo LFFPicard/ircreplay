@@ -5,6 +5,7 @@ import { useSession } from '../context/SessionContext'
 import { generateStatsHtml, downloadFile } from '../lib/exportHtml'
 import { saveSession } from '../lib/exportSession'
 import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
+import { useUser } from '../context/UserContext'
 
 const THEMES_DESKTOP = [
   { id: 'light',   label: '☀️ Light'   },
@@ -27,6 +28,7 @@ const NAV_LINKS = [
 ]
 
 function Nav({ isMobile }) {
+  const { isPremium } = useUser()
   const { theme, setTheme }   = useTheme()
   const { session, stats }    = useSession()
   const navigate              = useNavigate()
@@ -57,6 +59,51 @@ function Nav({ isMobile }) {
   const handleSave = () => {
     if (!canSave) return
     saveSession(session)
+  }
+
+  const handleCloudSave = async () => {
+    if (!canSave || !userId) return
+    try {
+      // Request presigned upload URL from function
+      const res = await fetch('/api/logs', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': userId },
+        body: JSON.stringify({
+          channel: session.channel,
+          date:    session.date,
+          size:    0,
+        }),
+      })
+      const { url, sessionId } = await res.json()
+      if (!url) throw new Error('No upload URL')
+
+      // Strip raw field same as local save
+      const compactEvents = session.events.map(({ raw, ...rest }) => rest)
+      const exportData = {
+        version:   1,
+        savedAt:   new Date().toISOString(),
+        channel:   session.channel,
+        date:      session.date,
+        dateEnd:   session.dateEnd,
+        fileCount: session.fileCount,
+        nicks:     session.nicks,
+        stats:     session.stats,
+        events:    compactEvents,
+      }
+      const json = JSON.stringify(exportData)
+
+      // Upload directly to R2 via presigned URL
+      await fetch(url, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    json,
+      })
+
+      alert(`Session saved to cloud! View it at /dashboard`)
+    } catch (err) {
+      console.error('Cloud save failed:', err)
+      alert('Cloud save failed — please try again')
+    }
   }
 
   const handleNavClick = (to) => {
@@ -120,6 +167,15 @@ function Nav({ isMobile }) {
               </button>
             ))}
 
+            {isPremium && userId && (
+              <button
+                onClick={() => handleNavClick('/dashboard')}
+                className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm"
+              >
+                Dashboard
+              </button>
+            )}
+
             {/* Pro button in mobile menu */}
             <button
               onClick={() => handleNavClick('/pro')}
@@ -157,6 +213,14 @@ function Nav({ isMobile }) {
                 className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm"
               >
                 💾 Save Session
+              </button>
+            )}
+            {canSave && isPremium && userId && (
+              <button
+                onClick={() => { handleCloudSave(); setMenuOpen(false) }}
+                className="text-left px-6 py-3 text-blue-400 hover:bg-blue-500/10 transition-colors border-b border-gray-800 text-sm"
+              >
+                ☁️ Cloud Save
               </button>
             )}
             {canExport && (
@@ -201,6 +265,11 @@ function Nav({ isMobile }) {
           {link.label}
         </NavLink>
       ))}
+      {isPremium && userId && (
+        <NavLink to="/dashboard" className={linkClass}>
+          Dashboard
+        </NavLink>
+      )}
 
       {/* Pro coming soon button */}
       <NavLink
@@ -224,6 +293,26 @@ function Nav({ isMobile }) {
             className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
           >
             💾 Save Session
+          </button>
+        )}
+
+        {/* Save session buttons */}
+        {canSave && (
+          <button
+            onClick={handleSave}
+            title="Save session as JSON — reload later without re-uploading logs"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          >
+            💾 Save
+          </button>
+        )}
+        {canSave && isPremium && userId && (
+          <button
+            onClick={handleCloudSave}
+            title="Save session to cloud — access from any device"
+            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          >
+            ☁️ Cloud Save
           </button>
         )}
 

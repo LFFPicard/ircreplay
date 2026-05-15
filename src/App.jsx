@@ -13,12 +13,14 @@ import Links from './pages/Links'
 import ComingSoon from './pages/ComingSoon'
 import { UserProvider } from './context/UserContext'
 import Pricing from './pages/Pricing'
+import Dashboard from './pages/Dashboard'
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Viewer />} />
       <Route path="/stats" element={<Stats />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/about" element={<About />} />
       <Route path="/help" element={<Help />} />
       <Route path="/links" element={<Links />} />
