@@ -9,7 +9,7 @@ const PLANS = [
     period:    'forever',
     highlight: false,
     badge:     null,
-    badgeClass: 'bg-green-500 text-black',
+    badgeClass: '',
     priceId:   null,
     features: [
       'Full IRC log viewer',
@@ -118,33 +118,25 @@ function PlanCard({ plan }) {
   const checkColour   = isHighlight ? 'text-green-400' : 'text-gray-500'
   const headingColour = isHighlight ? 'text-green-400' : 'text-gray-200'
 
-  // Button label and style changes based on auth state
   const btnLabel = isFree ? plan.cta : isSignedIn ? plan.cta : 'Sign in to purchase'
   const btnStyle = isFree ? plan.ctaStyle : isSignedIn ? plan.ctaStyle : 'signin'
 
   const handleCheckout = () => {
-    // Free plan — go to viewer
     if (isFree) {
       window.location.href = '/'
       return
     }
-    // Not signed in — open Clerk sign in modal
     if (!isSignedIn) {
       openSignIn()
       return
     }
-    // Paddle not loaded
     if (!window.Paddle) {
       console.error('Paddle.js not loaded')
       return
     }
-    // Open Paddle checkout overlay
     window.Paddle.Checkout.open({
       items: [{ priceId: plan.priceId, quantity: 1 }],
       customData: { clerk_user_id: userId },
-      eventCallback: (event) => {
-        console.log('Paddle event:', event.name)
-      },
     })
   }
 
@@ -177,13 +169,8 @@ function Pricing() {
   useEffect(() => {
     const initPaddle = () => {
       if (!window.Paddle) return
-      // TODO: Remove Environment.set when going live — sandbox only
-      window.Paddle.Environment.set('sandbox')
       window.Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        eventCallback: (event) => {
-          console.log('Paddle init event:', event.name)
-        },
       })
     }
 
@@ -202,7 +189,6 @@ function Pricing() {
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
 
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-mono px-3 py-1 rounded-full">&#9889; Pro &mdash; Coming Soon</div>
           <h1 className="text-3xl font-bold text-white font-mono">Simple, honest pricing</h1>
           <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">IRCReplay is free forever. Pro adds cloud storage, share links and richer stats for the people who want more. No dark patterns, no surprise charges.</p>
         </div>
@@ -226,12 +212,6 @@ function Pricing() {
               <p className="text-gray-400 text-sm leading-relaxed pl-3 border-l border-gray-700">{faq.a}</p>
             </div>
           ))}
-        </div>
-
-        <div className="bg-gray-800 rounded-xl p-6 text-center space-y-3">
-          <p className="text-gray-300 font-semibold">Not sure yet?</p>
-          <p className="text-gray-400 text-sm">Join the waitlist and get notified when Pro launches &mdash; including first access to the lifetime deal.</p>
-          <a href="/pro" className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold px-6 py-2.5 rounded-lg transition-colors">&#9889; Join the waitlist</a>
         </div>
 
         <div className="border-t border-gray-700 pt-6">

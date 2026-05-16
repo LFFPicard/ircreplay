@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { SessionProvider } from './context/SessionContext'
 import { UserProvider } from './context/UserContext'
+import { useAuth } from '@clerk/react'
+import { Navigate } from 'react-router-dom'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import ClassicChrome from './components/ClassicChrome'
@@ -11,12 +13,9 @@ import Stats from './pages/Stats'
 import About from './pages/About'
 import Help from './pages/Help'
 import Links from './pages/Links'
-import ComingSoon from './pages/ComingSoon'
 import Pricing from './pages/Pricing'
 import Dashboard from './pages/Dashboard'
 import ShareView from './pages/ShareView'
-import { useAuth } from '@clerk/react'
-import { Navigate } from 'react-router-dom'
 import Terms   from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Refunds from './pages/Refunds'
@@ -31,17 +30,16 @@ function ProtectedRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Viewer />} />
-      <Route path="/stats" element={<Stats />} />
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/about" element={<About />} />
-      <Route path="/help" element={<Help />} />
-      <Route path="/links" element={<Links />} />
-      <Route path="/pro" element={<ComingSoon />} />
+      <Route path="/"        element={<Viewer />} />
+      <Route path="/stats"   element={<Stats />} />
+      <Route path="/about"   element={<About />} />
+      <Route path="/help"    element={<Help />} />
+      <Route path="/links"   element={<Links />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route path="/terms" element={<Terms />} />
+      <Route path="/terms"   element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/refunds" element={<Refunds />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     </Routes>
   )
 }

@@ -8,14 +8,14 @@ import { Show, SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/re
 import { useUser } from '../context/UserContext'
 
 const THEMES_DESKTOP = [
-  { id: 'light',   label: '☀️ Light'   },
-  { id: 'dark',    label: '🌙 Dark'    },
-  { id: 'classic', label: '💾 Classic' },
+  { id: 'light',   label: '&#9728;&#65039; Light'   },
+  { id: 'dark',    label: '&#127769; Dark'    },
+  { id: 'classic', label: '&#128190; Classic' },
 ]
 
 const THEMES_MOBILE = [
-  { id: 'light', label: '☀️' },
-  { id: 'dark',  label: '🌙' },
+  { id: 'light', label: '&#9728;&#65039;' },
+  { id: 'dark',  label: '&#127769;'  },
 ]
 
 const NAV_LINKS = [
@@ -143,9 +143,8 @@ function Nav({ isMobile }) {
                   className={`px-2 py-1 rounded-md text-sm transition-colors ${
                     theme === t.id ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'
                   }`}
-                >
-                  {t.label}
-                </button>
+                  dangerouslySetInnerHTML={{ __html: t.label }}
+                />
               ))}
             </div>
             <button
@@ -181,26 +180,17 @@ function Nav({ isMobile }) {
               </button>
             )}
 
-            <button
-              onClick={() => handleNavClick('/pro')}
-              className="text-left px-6 py-3 text-yellow-400 hover:bg-yellow-500/10 transition-colors border-b border-gray-800 text-sm font-bold"
-            >
-              &#9889; Pro &mdash; Coming Soon
-            </button>
-
             <Show when="signed-out">
               <SignInButton mode="modal">
                 <button className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm w-full">
                   Sign In
                 </button>
               </SignInButton>
-              {/* SIGN UP — uncomment when Pro launches
               <SignUpButton mode="modal">
                 <button className="text-left px-6 py-3 text-green-400 hover:bg-green-500/10 transition-colors border-b border-gray-800 text-sm w-full font-semibold">
                   Sign Up for Pro
                 </button>
               </SignUpButton>
-              */}
             </Show>
             <Show when="signed-in">
               <div className="px-6 py-3 border-b border-gray-800 flex items-center gap-3">
@@ -275,17 +265,6 @@ function Nav({ isMobile }) {
           </NavLink>
         )}
 
-        <NavLink
-          to="/pro"
-          className={({ isActive }) =>
-            isActive
-              ? 'bg-yellow-500 text-black text-xs font-bold px-3 py-1.5 rounded-lg'
-              : 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors'
-          }
-        >
-          &#9889; Pro &mdash; Coming Soon
-        </NavLink>
-
         <div className="ml-auto flex items-center gap-3">
 
           {canSave && (
@@ -339,13 +318,11 @@ function Nav({ isMobile }) {
                 Sign In
               </button>
             </SignInButton>
-            {/* SIGN UP — uncomment when Pro launches
             <SignUpButton mode="modal">
               <button className="bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
                 Sign Up
               </button>
             </SignUpButton>
-            */}
           </Show>
           <Show when="signed-in">
             <UserButton afterSignOutUrl="/" />
@@ -359,9 +336,8 @@ function Nav({ isMobile }) {
                 className={`px-3 py-1 rounded-md text-sm transition-colors ${
                   theme === t.id ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'
                 }`}
-              >
-                {t.label}
-              </button>
+                dangerouslySetInnerHTML={{ __html: t.label }}
+              />
             ))}
           </div>
 
