@@ -296,10 +296,11 @@ function Nav({ isMobile }) {
         {canSave && isPremium && userId && (
           <button
             onClick={handleCloudSave}
+            disabled={cloudSaving}
             title="Save session to cloud — access from any device"
-            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 disabled:opacity-50 disabled:cursor-wait text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
           >
-            ☁️ Cloud Save
+            {cloudSaving ? '☁️ Saving...' : '☁️ Cloud Save'}
           </button>
         )}
 
