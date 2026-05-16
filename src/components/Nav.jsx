@@ -33,6 +33,7 @@ function Nav({ isMobile }) {
   const navigate              = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [exportMode, setExportMode] = useState('html')
+  const [cloudSaving, setCloudSaving] = useState(false)
   const { userId }        = useAuth()
   const { isPremium }     = useUser()
 
@@ -61,8 +62,6 @@ function Nav({ isMobile }) {
     if (!canSave) return
     saveSession(session)
   }
-
-const [cloudSaving, setCloudSaving] = useState(false)
 
   const handleCloudSave = async () => {
     if (!canSave || !userId || cloudSaving) return
