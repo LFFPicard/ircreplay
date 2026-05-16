@@ -8,12 +8,12 @@ function Footer() {
         <span className="text-gray-700 text-xs hidden sm:block">&middot;</span>
         <a href="/links" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Links</a>
         <span className="text-gray-700 text-xs hidden sm:block">&middot;</span>
-        <a href="/terms"   className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">Terms</a>
-        <a href="/privacy" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">Privacy</a>
-        <a href="/refunds" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">Refunds</a>
+        <a href="/terms"   className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Terms</a>
+        <a href="/privacy" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Privacy</a>
+        <a href="/refunds" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Refunds</a>
         <span className="text-green-400 text-xs hidden lg:block whitespace-nowrap">Keep the lights on:</span>
-        <a href="https://ko-fi.com/baggins83" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">Ko-fi</a>
-        <a href="https://www.paypal.com/paypalme/garyt83" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">PayPal</a>
+        <a href="https://ko-fi.com/baggins83" target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Ko-fi</a>
+        <a href="https://www.paypal.com/paypalme/garyt83" target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">PayPal</a>
       </div>
     </footer>
   )

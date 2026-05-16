@@ -216,9 +216,9 @@ function ClassicChrome({ children }) {
         {session && <StatusPanel text={`${users} users`} minWidth="80px" />}
         <div style={{ flex: 1 }} />
         <StatusPanel text="© 2026 IRCReplay.app" />
-        <a href="/terms"   className="text-gray-600 hover:text-gray-400 text-xs transition-colors">Terms</a>
-        <a href="/privacy" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">Privacy</a>
-        <a href="/refunds" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">Refunds</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/refunds">Refunds</a>
         <a href="https://ko-fi.com/baggins83" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: NAVY, fontFamily: FONT, padding: '1px 4px', ...insetBorder, textDecoration: 'none' }}>Ko-fi</a>
         <a href="https://www.paypal.com/paypalme/garyt83" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: NAVY, fontFamily: FONT, padding: '1px 4px', ...insetBorder, textDecoration: 'none' }}>PayPal</a>
       </div>
