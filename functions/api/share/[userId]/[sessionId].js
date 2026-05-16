@@ -35,7 +35,11 @@ export async function onRequestGet(context) {
     const text = await object.text()
     return new Response(text, {
       status:  200,
-      headers: { ...HEADERS, 'Cache-Control': 'public, max-age=3600' },
+      headers: {
+        ...HEADERS,
+        'Cache-Control':  'private, no-store',
+        'X-Robots-Tag':   'noindex, nofollow',
+      },
     })
 
   } catch (err) {

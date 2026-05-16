@@ -521,6 +521,15 @@ function ShareView() {
   const workerRef = useRef(null)
 
   useEffect(() => {
+  document.title = 'IRCReplay — Shared Stats'
+  const meta = document.createElement('meta')
+  meta.name = 'robots'
+  meta.content = 'noindex, nofollow'
+  document.head.appendChild(meta)
+  return () => document.head.removeChild(meta)
+  }, [])
+
+  useEffect(() => {
     const load = async () => {
       try {
         setPhase('loading')
