@@ -1,526 +1,700 @@
-Session Start: Fri Mar 15 19:00:00 2002
-Session Ident: #ircreplay-demo
-[19:00] *** Now talking in #ircreplay-demo
-[19:00] *** Topic is 'Welcome to #ircreplay-demo | The place to be | Rules: be cool'
-[19:00] *** Set by Maverick on Thu Mar 14 22:14:07 2002
-[19:00] *** Maverick sets mode: +o Lara
-[19:00] *** Maverick sets mode: +o Squishy
-[19:01] <Maverick> evening all
-[19:01] <Lara> hey Mav :)
-[19:01] <Squishy> yo
-[19:02] *** Shadow (shadow@dial-42.isp.net) has joined #ircreplay-demo
-[19:02] <Shadow> hey guys whats up
-[19:02] <Maverick> not much, just chilling
-[19:02] <Lara> Shadow! long time no see
-[19:03] <Shadow> yeah been busy with uni stuff :/
-[19:03] <Squishy> how is that going?
-[19:03] <Shadow> dont ask lol
-[19:04] *** Picard (picard@host-23.network.org) has joined #ircreplay-demo
-[19:04] *** Maverick sets mode: +v Picard
-[19:04] <Picard> evening
-[19:04] <Maverick> hey Picard, grab a seat
-[19:04] <+Picard> cheers
-[19:05] <Lara> anyone seen Tobz lately?
-[19:05] <Maverick> not since last week
-[19:05] <Shadow> he was on yesterday I think
-[19:05] <Squishy> nah that was Tobz|away he never actually said anything
-[19:06] *** Nuying (Nuying@cust-99.broadband.isp.co.uk) has joined #ircreplay-demo
-[19:06] <Nuying> HEY EVERYONE
-[19:06] <Maverick> lol calm down Nuying
-[19:06] <Lara> haha
-[19:06] <Nuying> SORRY CAPS LOCK
-[19:06] <Nuying> hey everyone :)
-[19:07] <Squishy> smoother
-[19:07] <+Picard> so what are we talking about
-[19:07] <Maverick> absolutely nothing as usual
-[19:07] <Lara> the finer things in life
-[19:07] <Shadow> like what game everyone is playing
-[19:08] <Nuying> STILL playing counter-strike
-[19:08] <Nuying> still*
-[19:08] <Maverick> its 2002 and you are still playing cs 1.3?
-[19:08] <Nuying> dont judge me
-[19:08] <Lara> hahahaha
-[19:09] <Squishy> anyone tried that new game, Neverwinter Nights?
-[19:09] <Shadow> yeah its pretty good
-[19:09] <Maverick> the toolset is insane, you can build whole campaigns
-[19:09] <+Picard> check this out http://www.neverwinternights.com
-[19:09] <Lara> ooh nice
-[19:10] <Shadow> the multiplayer is really fun too
-[19:10] <Nuying> is it like diablo?
-[19:10] <Maverick> kind of but way more depth
-[19:10] <Squishy> yeah its proper RPG not just clickfest
-[19:11] *** Tobz (tobz@tobz.users.quakenet.org) has joined #ircreplay-demo
-[19:11] *** Maverick sets mode: +o Tobz
-[19:11] <@Tobz> evening lads
-[19:11] <Lara> TOBZ
-[19:11] <Maverick> speak of the devil
-[19:11] <@Tobz> oh yeah? what were you saying
-[19:11] <Squishy> just wondering where you were
-[19:12] <@Tobz> been at my sisters, just got back
-[19:12] <Shadow> how is she doing
-[19:12] <@Tobz> yeah good cheers
-[19:12] * Lara makes tea for everyone
-[19:12] <Maverick> cheers Lara :)
-[19:13] <Nuying> ooh yes please
-[19:13] <@Tobz> legend
-[19:13] * Shadow grabs a biscuit
-[19:13] <Lara> oi that was mine
-[19:13] <Shadow> too slow :P
-[19:14] <Squishy> so anyone going to that LAN next month?
-[19:14] <Maverick> which one?
-[19:14] <Squishy> the one Dave organises every year
-[19:14] <@Tobz> oh yeah I am, should be good
-[19:14] <+Picard> where is it?
-[19:15] <Squishy> same place as last year, the scout hut in town
-[19:15] <Lara> haha the scout hut
-[19:15] <Maverick> its got tables and power what more do you need
-[19:15] <Nuying> and bad coffee
-[19:15] <@Tobz> the coffee is terrible yes
-[19:16] <Shadow> I might come if I can get the weekend off work
-[19:16] <Squishy> you should it was really good last year
-[19:16] <+Picard> what games do people play there?
-[19:16] <Maverick> whatever people bring, last year it was mostly quake and cs
-[19:17] <@Tobz> and that 4 hour age of empires match that nearly ended friendships
-[19:17] <Lara> OH GOD dont remind me
-[19:17] <Nuying> hahahaha what happened
-[19:17] <Maverick> long story involving a betrayal and a trade agreement
-[19:17] <Shadow> sounds dramatic
-[19:18] <@Tobz> it was
-[19:18] * Squishy still hasnt forgiven Maverick
-[19:18] <Maverick> IT WAS A LEGITIMATE STRATEGY
-[19:18] <Lara> lmaooo
-[19:18] <Nuying> haha
-[19:19] <+Picard> right I have to pop out for a bit, back later
-[19:19] *** Picard (picard@host-23.network.org) has left #ircreplay-demo (back in a bit)
-[19:19] <Maverick> later Picard
-[19:19] <Shadow> cya
-[19:20] *** Misty (misty@misty.users.quakenet.org) has joined #ircreplay-demo
-[19:20] <Misty> evening :)
-[19:20] <Lara> hey Misty!
-[19:20] <@Tobz> yo
-[19:20] <Maverick> hey
-[19:20] <Misty> what did I miss
-[19:21] <Squishy> Maverick betrayed us all at a LAN
-[19:21] <Maverick> I am never going to live this down
-[19:21] <Misty> haha sounds about right
-[19:21] <Nuying> anyone know any good websites for game cheats?
-[19:21] <Maverick> Nuying no
-[19:21] <@Tobz> gamefaqs.com is pretty good for guides
-[19:22] <Nuying> cheers
-[19:22] <Lara> not cheats though use your brain
-[19:22] <Nuying> my brain said look up the answer :P
-[19:22] <Shadow> fair logic
-[19:23] <Misty> so is everyone going to the LAN?
-[19:23] <Squishy> hopefully yeah
-[19:23] <@Tobz> yep
-[19:23] <Maverick> definitely
-[19:23] <Misty> cool I might come too then
-[19:23] <Lara> yes do it!
-[19:24] *** Maverick changes topic to 'Welcome to #ircreplay-demo | LAN - 12th April - Whos in? | Rules: be cool'
-[19:24] <@Tobz> nice one Mav
-[19:24] <Misty> ooh official
-[19:25] <Shadow> right I need food brb
-[19:25] * Shadow is away (food)
-[19:25] <Maverick> same actually, anyone want anything from the kitchen
-[19:25] <Lara> tea please :)
-[19:25] <@Tobz> biscuits if you have them
-[19:26] <Squishy> I am fine cheers
-[19:26] * Maverick disappears into the kitchen
-[19:26] <Nuying> this is the most wholesome IRC channel I have ever been in
-[19:26] <Lara> haha we try
-[19:26] <@Tobz> it has its moments
-[19:27] *** Rage (rage@cust-182.cable.provider.com) has joined #ircreplay-demo
-[19:27] <Rage> hey
-[19:27] <Lara> hey Rage
-[19:27] <@Tobz> alright
-[19:27] <Rage> who runs this channel
-[19:27] <@Tobz> Maverick mostly, why?
-[19:28] <Rage> just asking
-[19:28] <Misty> you ok?
-[19:28] <Rage> yeah fine
-[19:28] <Nuying> he seems friendly
-[19:29] <Rage> oi I can read that
-[19:29] <Nuying> I know :)
-[19:29] <Lara> play nice children
-[19:29] <@Tobz> haha
-[19:30] *** Maverick (mav@maverick.users.quakenet.org) has joined #ircreplay-demo
-[19:30] <Maverick> back, tea is brewing
-[19:30] <Lara> yay
-[19:30] <Maverick> who is Rage?
-[19:30] <@Tobz> no idea just showed up
-[19:31] <Rage> I am a friend of Picard
-[19:31] <Maverick> ah right, welcome then
-[19:31] <Rage> cheers
-[19:31] * Shadow is back (gone 6 mins)
-[19:31] <Shadow> what did I miss
-[19:32] <Maverick> new person, friend of Picard
-[19:32] <Shadow> cool
-[19:32] <Squishy> Shadow what did you have?
-[19:32] <Shadow> cheese on toast
-[19:32] <Nuying> nice
-[19:33] <Lara> simple but effective
-[19:33] <@Tobz> right I need to sort some stuff out, might go a bit quiet
-[19:33] <Maverick> no worries
-[19:33] * Tobz is now known as Tobz|busy
-[19:34] <Misty> has anyone seen that new film, Lord of the Rings?
-[19:34] <Maverick> YES it is incredible
-[19:34] <Lara> oh my god yes so good
-[19:34] <Shadow> seen it twice already
-[19:34] <Nuying> I still havent seen it
-[19:34] <Misty> Nuying
-[19:34] <Maverick> what are you doing with your life
-[19:35] <Nuying> playing counter-strike apparently
-[19:35] <Lara> hahahaha
-[19:35] <Squishy> it is genuinely one of the best films I have ever seen
-[19:35] <Shadow> the battle of helms deep is just... wow
-[19:35] <Rage> is it worth seeing if you havent read the books?
-[19:35] <Maverick> absolutely yes
-[19:35] <Misty> definitely
-[19:36] <Lara> the books are amazing too though
-[19:36] <Rage> might go see it this weekend then
-[19:36] <Shadow> do it you wont regret it
-[19:36] * Squishy could talk about LOTR all day
-[19:36] <Maverick> we know Squish, we know
-[19:37] *** Picard (picard@host-23.network.org) has joined #ircreplay-demo
-[19:37] *** Maverick sets mode: +v Picard
-[19:37] <+Picard> back
-[19:37] <Maverick> wb
-[19:37] <+Picard> ah Rage you found it then
-[19:37] <Rage> yeah cheers for the invite
-[19:37] <+Picard> good bunch of people
-[19:38] <Maverick> aw cheers
-[19:38] <Lara> :)
-[19:38] <Nuying> most of the time
-[19:38] <@Tobz|busy> heh
-[19:39] <Shadow> oi Tobz I thought you were busy
-[19:39] <@Tobz|busy> I am, just watching
-[19:39] <Misty> lurker
-[19:39] <@Tobz|busy> guilty
-[19:40] *** DarkMatter (dm@host-77.access.net) has joined #ircreplay-demo
-[19:40] <DarkMatter> evening
-[19:40] <Maverick> DM! alright mate
-[19:40] <Lara> hey DarkMatter :)
-[19:41] <DarkMatter> good cheers, busy in here tonight
-[19:41] <Squishy> yeah good turnout
-[19:41] <DarkMatter> so what is the gossip
-[19:41] <Shadow> Nuying hasnt seen Lord of the Rings
-[19:41] <DarkMatter> ...Nuying
-[19:41] <Nuying> oh come on not again
-[19:42] <Lara> hahaha
-[19:42] <+Picard> it is genuinely baffling
-[19:42] <Rage> I havent seen it either to be fair
-[19:42] <DarkMatter> ok Rage gets a pass because I dont know you
-[19:42] <Rage> cheers I think
-[19:43] <Maverick> Rage is a friend of Picard, just found the channel
-[19:43] <DarkMatter> welcome to the chaos
-[19:43] <Rage> seems pretty calm to me
-[19:43] <DarkMatter> early yet
-[19:44] <Nuying> that sounds ominous
-[19:44] <Maverick> it is not that bad
-[19:44] <@Tobz|busy> usually
-[19:45] <Squishy> anyone done any good programming lately?
-[19:45] <Maverick> been playing with PHP actually
-[19:45] <Shadow> nice, what are you building
-[19:45] <Maverick> just a little stats page for the channel, nothing fancy
-[19:45] <Lara> oh that could be cool
-[19:46] <+Picard> like mIRCStats but custom?
-[19:46] <Maverick> kind of yeah, just something to see who talks the most
-[19:46] <DarkMatter> spoiler it is Lara
-[19:46] <Lara> EXCUSE ME
-[19:46] <DarkMatter> hahaha
-[19:47] <Shadow> he is not wrong
-[19:47] <Lara> I hate you all
-[19:47] <Maverick> haha love you too Lara
-[19:47] <Squishy> I think it is actually Squishy who talks most but ok
-[19:47] <Nuying> Squishy referring to himself in third person is a sign
-[19:47] <@Tobz|busy> hahaha
-[19:48] <Misty> right I need to make dinner, back in a bit
-[19:48] * Misty is away (cooking)
-[19:48] <Lara> what are you making?
-[19:48] <Misty> pasta probably
-[19:48] <DarkMatter> nice
-[19:49] <Rage> so this LAN thing in April, is it open to anyone?
-[19:49] <Maverick> yeah pretty much, the more the merrier
-[19:49] <+Picard> bring your PC and a power strip
-[19:49] <Rage> sounds good, I might come
-[19:49] <Shadow> the more people the better the quake matches
-[19:50] <DarkMatter> oh we playing quake this year?
-[19:50] <Maverick> hoping so yeah
-[19:50] <Squishy> and please can we NOT do another 4 hour age of empires game
-[19:50] <Maverick> I have apologised for that
-[19:50] <@Tobz|busy> not enough
-[19:51] <Nuying> I feel like I need to know the full story of this age of empires thing
-[19:51] <DarkMatter> oh boy
-[19:51] <Lara> basically Maverick allied with Shadow against the rest of us, won, then immediately betrayed Shadow
-[19:51] <Shadow> I still think about it
-[19:51] <Maverick> IT WAS A POWER MOVE
-[19:52] <Nuying> hahaha thats actually impressive
-[19:52] <Rage> savage
-[19:52] <DarkMatter> we were not impressed at the time
-[19:52] <+Picard> there were nearly actual tears
-[19:52] <Maverick> oh come on
-[19:52] <Squishy> there were
-[19:53] * Maverick hides
-[19:53] <Lara> hahahahaha
-[19:53] <@Tobz|busy> I remember it well
-[19:53] <Shadow> I trusted you Maverick
-[19:53] <Maverick> and I turned that trust into VICTORY
-[19:54] <DarkMatter> ok I will give him points for commitment
-[19:54] <Nuying> same tbh
-[19:54] <Rage> haha this channel is great
-[19:54] <+Picard> told you
-[19:55] *** Maverick was kicked by Tobz|busy (justice for Shadow)
-[19:55] *** Maverick (mav@maverick.users.quakenet.org) has joined #ircreplay-demo
-[19:55] <Maverick> ...tobz
-[19:55] <@Tobz|busy> worth it
-[19:55] <Lara> HAHAHAHA
-[19:55] <Shadow> thank you Tobz
-[19:55] <DarkMatter> beautiful
-[19:56] <Nuying> I love this place
-[19:56] <Maverick> I deserved that
-[19:56] <Squishy> you really did
-[19:56] <+Picard> lol
-[19:57] <Rage> ok I am definitely coming to this LAN
-[19:57] <Maverick> haha welcome to the group Rage
-[19:57] <DarkMatter> so what time does it start in April?
-[19:57] <Maverick> Dave usually opens up about 10am
-[19:58] <Shadow> and it goes til whenever people pass out
-[19:58] <Squishy> last year I think someone was still there at 6am
-[19:58] <Nuying> that is dedication
-[19:58] <Lara> that was me I am not proud
-[19:59] <DarkMatter> hahaha
-[19:59] <@Tobz|busy> Lara!
-[19:59] <Lara> I got really into the quake tournament ok
-[19:59] <+Picard> fair enough
-[20:00] <Maverick> right I should probably do some actual work tonight
-[20:00] <Shadow> on a Friday?
-[20:00] <Maverick> deadlines dont care about Fridays
-[20:00] <Lara> oof
-[20:01] <Squishy> what are you working on?
-[20:01] <Maverick> website for a local business, pretty boring stuff
-[20:01] <DarkMatter> pays the bills though
-[20:01] <Maverick> exactly
-[20:01] <Nuying> I could never do web stuff, all those tags
-[20:02] <Maverick> you get used to it
-[20:02] <+Picard> HTML is not that bad once you get the hang of it
-[20:02] <Shadow> its CSS that breaks my brain
-[20:02] <Maverick> haha yeah CSS is a dark art
-[20:02] <Lara> why is everything floating everywhere
-[20:03] <DarkMatter> hahahaha
-[20:03] <Squishy> the float property has caused me so much pain
-[20:03] <Nuying> glad I just play games
-[20:03] <Rage> same
-[20:04] *** Misty (misty@misty.users.quakenet.org) has joined #ircreplay-demo
-[20:04] * Misty is back (gone 16 mins)
-[20:04] <Misty> pasta achieved
-[20:04] <Lara> yay
-[20:04] <DarkMatter> good effort
-[20:05] <Misty> what did I miss
-[20:05] <Shadow> Tobz kicked Maverick
-[20:05] <Misty> FINALLY
-[20:05] <@Tobz|busy> haha
-[20:05] <Maverick> I am never going to escape this
-[20:06] <Lara> nope
-[20:06] <+Picard> probably not
-[20:06] <Nuying> I only found out about it tonight and even I am judging you
-[20:06] <Maverick> wow ok
-[20:07] <DarkMatter> right I need to head off, early start tomorrow
-[20:07] <Maverick> no worries mate, take care
-[20:07] <Lara> night DarkMatter :)
-[20:07] <Squishy> later
-[20:07] <@Tobz|busy> night DM
-[20:07] *** DarkMatter (dm@host-77.access.net) Quit (night all, good chat)
-[20:08] <Shadow> right I should probably be sensible too
-[20:08] <Misty> oh no you too?
-[20:08] <Shadow> yeah got stuff to do tomorrow
-[20:08] <Lara> boooo
-[20:08] <Shadow> haha sorry, will be on tomorrow night though
-[20:09] <Maverick> cool, see you then
-[20:09] <+Picard> later Shadow
-[20:09] *** Shadow (shadow@dial-42.isp.net) Quit (night everyone!)
-[20:09] <Nuying> it is thinning out
-[20:09] <Misty> still a few of us
-[20:10] <Squishy> the hardcore remain
-[20:10] <Lara> always
-[20:10] *** Tobz|busy is now known as Tobz
-[20:10] <@Tobz> right that is done, I am back
-[20:10] <Maverick> welcome back
-[20:10] <Misty> what were you doing?
-[20:11] <@Tobz> just sorting out some stuff for next week, nothing exciting
-[20:11] <Lara> fair enough
-[20:11] <Nuying> right I should probably sleep, got work at 8
-[20:11] <Maverick> ouch
-[20:11] <@Tobz> that is rough
-[20:12] <Nuying> yeah not ideal
-[20:12] <Misty> night Nuying!
-[20:12] <Lara> sleep well :)
-[20:12] *** Nuying (Nuying@cust-99.broadband.isp.co.uk) Quit (night, work tomorrow ugh)
-[20:12] <Squishy> and then there were five
-[20:12] <Maverick> fewer people means higher quality chat
-[20:13] <+Picard> that is one way to look at it
-[20:13] <Rage> am I still welcome or is this regulars only now?
-[20:13] <Maverick> haha of course mate, you are basically a regular now
-[20:13] <Rage> that was quick
-[20:14] <Misty> that is how it works here
-[20:14] <@Tobz> you survived the Maverick story, you are in
-[20:14] <Lara> hahahaha
-[20:14] <Rage> what an initiation
-[20:15] <Squishy> so Rage, what do you actually play?
-[20:15] <Rage> mostly quake and some RPGs
-[20:15] <Maverick> solid choices
-[20:15] <+Picard> quake player, you will fit right in at the LAN
-[20:15] <Rage> looking forward to it now
-[20:16] <@Tobz> right who wants to play something?
-[20:16] <Squishy> what did you have in mind
-[20:16] <@Tobz> quake 3 anyone?
-[20:16] <Maverick> yes
-[20:16] <Lara> ooh go on then
-[20:16] <+Picard> I am in
-[20:17] <Rage> yeah sure
-[20:17] <Misty> I will spectate, not very good at quake
-[20:17] <Squishy> same
-[20:17] <@Tobz> right Mav set up a server
-[20:17] <Maverick> on it, give me two minutes
-[20:18] <Maverick> ok server is up: 82.45.221.104 password: friday
-[20:18] <Lara> cheers
-[20:18] <+Picard> connecting
-[20:18] <Rage> nice one
-[20:19] * Maverick is now known as Maverick|Q3
-[20:19] * Lara is now known as Lara|Q3
-[20:19] <Squishy> have fun :)
-[20:19] <Misty> dont be too long!
-[20:19] <@Tobz> haha no promises
-[20:20] <Squishy> so Misty, how is the new job going?
-[20:20] <Misty> really good actually, much better than the last place
-[20:20] <Squishy> that is great to hear
-[20:21] <Misty> yeah the people are nicer and the hours are better
-[20:21] <Squishy> what are you doing again?
-[20:21] <Misty> admin at a solicitors, not glamorous but it is fine
-[20:22] <Squishy> beats being miserable though
-[20:22] <Misty> exactly
-[20:23] *** Lara|Q3 is now known as Lara
-[20:23] <Lara> that was quick
-[20:23] <Squishy> what happened
-[20:23] <Lara> Tobz absolutely demolished me, I need a sit down
-[20:23] <Misty> haha
-[20:24] <Squishy> Tobz is annoyingly good at quake
-[20:24] <Lara> its not fair he has been playing since like 1998
-[20:24] <Misty> the experience shows
-[20:25] *** Maverick|Q3 is now known as Maverick
-[20:25] <Maverick> ok I also got demolished
-[20:25] <Lara> haha solidarity
-[20:25] <Squishy> Tobz?
-[20:25] <Maverick> Tobz and Rage actually, Rage is really good
-[20:26] <Lara> oh interesting
-[20:26] <Misty> the new guy!
-[20:26] *** Rage is now known as Rage|Q3
-[20:26] <Squishy> haha he is still going
-[20:27] <Maverick> yeah he and Tobz are going head to head
-[20:27] <Lara> this should be good
-[20:27] <Maverick> the LAN is going to be interesting with Rage there
-[20:27] <Misty> genuinely excited for April now
-[20:28] <+Picard> me too, its been a while
-[20:28] <Squishy> same, feels like ages since the last one
-[20:28] <Maverick> right I am going to get another cup of tea and then actually do some of this work
-[20:28] <Lara> good luck
-[20:28] <Maverick> cheers, will be lurking
-[20:29] * Maverick is away (work, unfortunately)
-[20:29] <Misty> right I might actually watch some telly
-[20:29] <Lara> what are you watching?
-[20:29] <Misty> that new show everyone keeps talking about, 24
-[20:29] <Squishy> oh is that good?
-[20:30] <Misty> yeah really gripping, each episode is one hour of real time
-[20:30] <Lara> oh that sounds clever
-[20:30] <+Picard> I have heard good things
-[20:30] <Misty> definitely worth watching
-[20:30] <Lara> might check it out
-[20:31] *** Rage|Q3 is now known as Rage
-[20:31] <Rage> ok Tobz is a machine
-[20:31] <Lara> haha told you
-[20:31] <Squishy> what was the score
-[20:31] <Rage> I dont want to talk about it
-[20:31] <@Tobz> 34 to 18 :)
-[20:32] <Lara> tobz!
-[20:32] <@Tobz> what, he asked
-[20:32] <Rage> I nearly had you though
-[20:32] <@Tobz> you really did, you are good
-[20:32] <Rage> cheers
-[20:33] <+Picard> right I am going to head off, work tomorrow
-[20:33] <Maverick> night Picard
-[20:33] <Lara> night!
-[20:33] <@Tobz> later
-[20:33] *** Picard (picard@host-23.network.org) Quit (night all, good chat as always)
-[20:34] <Squishy> right I should probably go too
-[20:34] <Lara> aww ok
-[20:34] <Squishy> yeah early one tomorrow
-[20:34] <@Tobz> no worries, see you this weekend?
-[20:34] <Squishy> yeah should be about Saturday
-[20:35] <Maverick> cool
-[20:35] <Lara> night Squish :)
-[20:35] *** Squishy (squishy@squishy.users.quakenet.org) Quit (night everyone, good times)
-[20:35] <@Tobz> quiet now
-[20:35] <Rage> should I go too? dont want to outstay my welcome
-[20:36] <Maverick> nah its fine, stick around
-[20:36] <Lara> yeah dont be silly
-[20:36] <Misty> you are part of the furniture now
-[20:36] <Rage> haha cheers
-[20:37] <@Tobz> so Rage, how do you know Picard?
-[20:37] <Rage> uni, we were on the same course
-[20:37] <Maverick> what did you study?
-[20:37] <Rage> computer science
-[20:37] <Lara> oh nice
-[20:38] <@Tobz> makes sense, good at quake and CS grad
-[20:38] <Rage> haha stereotype much
-[20:38] <Maverick> he is not wrong though
-[20:38] <Misty> what are you doing now?
-[20:38] <Rage> just started at a small software company, writing Java mostly
-[20:39] <Maverick> nice, I am doing some web stuff freelance
-[20:39] <Rage> cool, is there money in that?
-[20:39] <Maverick> getting there, it takes a while to build up clients
-[20:40] <Lara> Mav is good though, he built our guild website
-[20:40] <Rage> nice, what game?
-[20:40] <Lara> we played Ultima Online for a while
-[20:40] <Rage> oh I loved UO
-[20:40] <@Tobz> everyone loved UO
-[20:41] <Maverick> until it all went wrong
-[20:41] <Lara> dont get him started
-[20:41] <Maverick> I will not go on about it
-[20:41] <Rage> haha fair
-[20:42] <Misty> right telly is calling me, night all :)
-[20:42] <Maverick> night Misty
-[20:42] <Lara> night! enjoy 24
-[20:42] <@Tobz> night
-[20:42] <Rage> night
-[20:42] *** Misty (misty@misty.users.quakenet.org) Quit (night! :))
-[20:43] <@Tobz> just us now
-[20:43] <Lara> the survivors
-[20:43] <Rage> quiet Friday night on IRC
-[20:43] <Maverick> the best kind
-[20:44] <Lara> honestly yes
-[20:44] <@Tobz> right I should sleep too, got a long day tomorrow
-[20:44] <Maverick> fair enough mate
-[20:44] <Lara> night Tobz!
-[20:44] <Rage> night
-[20:44] *** Tobz (tobz@tobz.users.quakenet.org) Quit (night all, good session)
-[20:45] <Lara> and then there were three
-[20:45] <Maverick> the final three
-[20:45] <Rage> I should probably head off too
-[20:45] <Lara> glad you found the channel :)
-[20:45] <Rage> yeah me too, good bunch of people
-[20:46] <Maverick> come back whenever, it is usually around this time
-[20:46] <Rage> will do, night
-[20:46] <Lara> night Rage!
-[20:46] *** Rage (rage@cust-182.cable.provider.com) Quit (night, see you all again soon)
-[20:47] <Lara> nice guy
-[20:47] <Maverick> yeah good addition to the channel
-[20:47] * Lara yawns
-[20:48] <Maverick> tired?
-[20:48] <Lara> a bit yeah
-[20:48] <Maverick> go sleep then, I need to do this work anyway
-[20:49] <Lara> yeah you are right
-[20:49] <Lara> night Mav :)
-[20:49] <Maverick> night Lara, sleep well
-[20:49] *** Lara (lara@lara.users.quakenet.org) Quit (night! :))
-[20:50] * Maverick is alone with the work
-[20:50] <Maverick> right then
-Session Close: Fri Mar 15 20:51:14 2002
+Session Start: Mon Mar 03 09:14:22 2025
+Session Ident: #dev-crew
+[09:14] *** Now talking in #dev-crew
+[09:14] *** Topic is '#dev-crew | the usual suspects | no bots allowed (except ChanServ)'
+[09:14] *** Set by Maverick on Fri Feb 28 21:03:11 2025
+[09:14] *** ChanServ sets mode: +o Maverick
+[09:15] <Maverick> morning all
+[09:15] <Lara> morning! early for you
+[09:16] <Maverick> couldnt sleep, been thinking about a project idea
+[09:16] <Tobz> oh yeah? what kind of project
+[09:17] <Maverick> you know all those old IRC logs I have from back in the day
+[09:17] <Lara> the prophecies ones?
+[09:17] <Maverick> yeah and loads of others, years worth
+[09:18] <Maverick> I want to build something to actually view them properly, like mIRCStats used to do but in the browser
+[09:18] <Tobz> oh that would be genuinely useful
+[09:18] <Squishy> mIRCStats! that takes me back
+[09:19] <Lara> I remember running that on the prophecies logs back in like 2004
+[09:19] <Maverick> exactly, but it was a pain to set up and the output was a static HTML page
+[09:19] <Maverick> I want something you just drag and drop the log file and it works
+[09:20] <Tobz> browser based?
+[09:20] <Maverick> yeah, all client side. logs never leave your machine
+[09:20] <Squishy> that is actually a really good idea
+[09:20] <Lara> people have tons of old logs just sitting around doing nothing
+[09:21] <Tobz> what tech were you thinking
+[09:21] <Maverick> React and Vite probably, Tailwind for styling, maybe Recharts for the graphs
+[09:21] <Tobz> solid stack
+[09:22] <Maverick> might use Claude to help me build it, I have been using it a lot lately for coding stuff
+[09:22] <Lara> the AI one?
+[09:22] <Maverick> yeah it is really good for working through problems and writing boilerplate
+[09:23] <Tobz> does it actually help or just hallucinate?
+[09:23] <Maverick> bit of both if im honest but mostly helps if you know what you are doing
+[09:23] <Squishy> interesting
+[09:24] <Maverick> anyway first step is just getting the parser working, mIRC log format is a bit weird with the control codes
+[09:24] <Tobz> colour codes and stuff?
+[09:24] <Maverick> yeah all the formatting bytes, need to strip those out
+[09:25] <Lara> well let me know when you have something to test
+[09:25] <Maverick> will do
+[09:26] <Squishy> so apart from the project idea, whats up
+[09:26] <Lara> just coffee and emails for me
+[09:26] <Tobz> same, Monday innit
+[09:27] <Maverick> Monday is a state of mind
+[09:27] <Lara> a bad one
+[09:27] <Squishy> hahahaha
+Session Close: Mon Mar 03 10:14:07 2025
+
+Session Start: Mon Mar 03 21:30:45 2025
+Session Ident: #dev-crew
+[21:30] *** Now talking in #dev-crew
+[21:31] <Maverick> right I have been hacking on this parser all evening
+[21:31] <Lara> and?
+[21:31] <Maverick> it actually works! loaded the prophecies logs and got 136k messages parsed
+[21:32] <Tobz> 136 thousand?
+[21:32] <Maverick> yeah that channel was active for years
+[21:32] <Squishy> thats insane
+[21:32] <Lara> how fast does it parse?
+[21:33] <Maverick> couple seconds, I put it in a web worker so it doesnt block the UI
+[21:33] <Tobz> nice
+[21:33] <Maverick> the format detection was the tricky bit, some logs have binary control codes and some are plain text
+[21:34] <Lara> different mIRC versions?
+[21:34] <Maverick> yeah and different settings, had to write two separate parsers basically
+[21:34] <Squishy> sounds like a pain
+[21:34] <Maverick> it was but Claude helped a lot actually, talked through the byte patterns with it
+[21:35] <Tobz> so it is like pair programming with an AI
+[21:35] <Maverick> kind of yeah, you still have to know what you want but it is good for figuring out the implementation
+[21:35] <Lara> interesting
+[21:36] <Maverick> anyway the basic viewer is working now, you can see the chat scrolling in real time with timestamps and nicks
+[21:36] <Squishy> replay mode?
+[21:36] <Maverick> yeah exactly, or instant view if you just want to browse
+[21:37] <Tobz> nice, let me know when I can try it
+[21:37] <Maverick> probably this week, got to add the stats engine next
+[21:37] <Lara> top chatters?
+[21:37] <Maverick> yeah, top chatters, hourly activity, word frequency, URLs, all the classics
+[21:38] <Squishy> ooh can you do who talks to who most
+[21:38] <Maverick> nick mentions you mean? yeah that is on the list
+[21:38] <Lara> that would be interesting on the prophecies logs
+[21:38] <Tobz> pretty sure Maverick mentioned Squishy approximately 1 million times
+[21:38] <Squishy> hahahaha
+[21:39] <Maverick> unfair
+[21:39] <Lara> is it though
+[21:39] <Maverick> ...probably not
+Session Close: Mon Mar 03 23:01:22 2025
+
+Session Start: Wed Mar 05 14:22:11 2025
+Session Ident: #dev-crew
+[14:22] *** Now talking in #dev-crew
+[14:22] <Picard> afternoon all
+[14:22] <Lara> hey Picard
+[14:23] <Picard> anyone about?
+[14:23] <Lara> just me and Shadow lurking
+[14:23] <Shadow> hey
+[14:23] <Picard> how is everyone
+[14:24] <Lara> not bad, waiting for Maverick to have something to test
+[14:24] <Picard> oh is he building something?
+[14:24] <Lara> yeah an IRC log viewer, browser based
+[14:24] <Picard> ooh that actually sounds useful
+[14:25] <Shadow> right? I still have logs from like 2003
+[14:25] <Lara> same, years worth
+[14:25] <Picard> wonder if he can get XChat format working too, I used XChat back in the day
+[14:25] <Lara> I will mention it to him
+[14:26] <Shadow> what time zone do we all think the channel is most active?
+[14:26] <Lara> evenings, like 8-11pm GMT usually
+[14:26] <Picard> yeah that tracks
+[14:26] <Shadow> I am always the weird afternoon one
+[14:27] <Lara> someone has to be
+[14:27] <Picard> haha
+[14:28] *** Zyle (zyle@cust.broadband.isp.co.uk) has joined #dev-crew
+[14:28] <Zyle> afternoon
+[14:28] <Lara> hey Zyle
+[14:28] <Picard> alright
+[14:28] <Zyle> what are we talking about
+[14:29] <Lara> Maverick is building an IRC log viewer
+[14:29] <Zyle> oh that is actually something I would use
+[14:29] <Shadow> right?
+[14:29] <Zyle> I have the old #gaming logs from 2006 to 2011
+[14:29] <Lara> oh wow
+[14:29] <Zyle> years of absolute chaos
+[14:29] <Picard> hahahaha
+[14:30] <Shadow> I bet
+[14:30] <Zyle> genuinely some of the most unhinged conversations I have ever had
+[14:30] <Lara> in the best way?
+[14:30] <Zyle> mostly yes
+Session Close: Wed Mar 05 15:47:33 2025
+
+Session Start: Thu Mar 06 20:15:44 2025
+Session Ident: #dev-crew
+[20:15] *** Now talking in #dev-crew
+[20:16] <Maverick> right I have stats working
+[20:16] <Lara> oooh
+[20:16] <Squishy> show us!
+[20:16] <Maverick> I need to set up hosting first but the top chatters on the prophecies logs
+[20:17] <Maverick> number 1 with 18,432 lines... Prophecies the bot
+[20:17] <Lara> hahahaha of course
+[20:17] <Squishy> bots always win
+[20:17] <Tobz> who is number 1 human
+[20:18] <Maverick> Squishy with 8,891 lines
+[20:18] <Squishy> WHAT
+[20:18] <Lara> hahahaha
+[20:18] <Tobz> I am not surprised at all
+[20:18] <Squishy> I talk a lot okay
+[20:19] <Maverick> in fairness you were basically there every single evening for like 4 years
+[20:19] <Lara> that is true
+[20:19] <Squishy> it was a good channel
+[20:19] <Tobz> still is technically it just moved here
+[20:20] <Maverick> also going to need a bot filter because otherwise the stats are all skewed by ProphServ and the others
+[20:20] <Lara> good shout
+[20:20] <Squishy> can you tick them off a list or something?
+[20:20] <Maverick> yeah thats the plan, exclude selected nicks from all stats
+[20:21] <Tobz> nice
+[20:21] <Maverick> anyway I am using Cloudflare Pages for hosting, deploying from GitHub
+[20:21] <Lara> nice and free
+[20:21] <Maverick> for the basic stuff yeah, might add R2 storage later for a premium tier
+[20:22] <Tobz> premium tier already?
+[20:22] <Maverick> eventually yeah, cloud save, share links, extended stats
+[20:22] <Squishy> what would the free tier be
+[20:22] <Maverick> everything basic, the viewer, stats, export. all runs in the browser, nothing stored anywhere
+[20:23] <Lara> that is actually a good split
+[20:23] <Tobz> people will appreciate the privacy angle, logs are personal
+[20:23] <Maverick> exactly
+Session Close: Thu Mar 06 22:44:21 2025
+
+Session Start: Fri Mar 07 11:30:02 2025
+Session Ident: #dev-crew
+[11:30] *** Now talking in #dev-crew
+[11:30] <Maverick> morning
+[11:30] <Shadow> morning
+[11:31] <Maverick> right I pushed the first working version to GitHub last night
+[11:31] <Shadow> is it live?
+[11:31] <Maverick> not publicly yet but Cloudflare is building it
+[11:32] <Shadow> cool
+[11:32] <Maverick> trying to get a good domain, thinking ircreplay.app
+[11:32] <Shadow> oh that is good
+[11:32] <Maverick> yeah short and descriptive
+[11:33] <Shadow> so whats the plan from here
+[11:33] <Maverick> get the core viewer solid, add the stats engine, then soft launch on Reddit
+[11:33] <Shadow> r/irc?
+[11:34] <Maverick> yeah and r/mirc probably, thats where most of the nostalgic crowd will be
+[11:34] <Shadow> smart
+[11:35] <Maverick> also Picard mentioned XChat format, is that different to mIRC?
+[11:35] <Shadow> yeah different timestamp format and the events use natural language
+[11:35] <Maverick> like "joined the channel" instead of "has joined"?
+[11:35] <Shadow> yeah exactly
+[11:36] <Maverick> ok should be doable, I will add it to the list
+[11:36] <Shadow> I have some XChat logs if you want test data
+[11:36] <Maverick> yes please that would be really helpful
+[11:37] <Shadow> will dig them out later
+[11:37] <Maverick> cheers
+[11:37] <Shadow> so how are you using Claude for this?
+[11:38] <Maverick> I basically have long sessions with it talking through what I want to build
+[11:38] <Maverick> it writes a lot of the boilerplate and I review and edit it
+[11:38] <Shadow> do you just accept what it writes
+[11:39] <Maverick> no definitely not, you have to understand what it is writing or you end up with code you cant debug
+[11:39] <Shadow> that makes sense
+[11:39] <Maverick> but it is really fast for things like writing the stats engine, lots of array manipulation stuff
+[11:40] <Shadow> interesting way to work
+[11:40] <Maverick> it has sped things up a lot honestly
+Session Close: Fri Mar 07 13:15:44 2025
+
+Session Start: Fri Mar 07 20:00:17 2025
+Session Ident: #dev-crew
+[20:00] *** Now talking in #dev-crew
+[20:00] <Lara> evening
+[20:00] <Maverick> evening!
+[20:01] <Tobz> alright everyone
+[20:01] <Squishy> yo
+[20:01] <Zyle> hey
+[20:01] <Picard> evening
+[20:02] <Lara> right Maverick show us this thing
+[20:02] <Maverick> it is not ready yet
+[20:02] <Lara> you said that yesterday
+[20:02] <Maverick> I mean it works but it is rough
+[20:02] <Tobz> rough is fine we are friends
+[20:03] <Squishy> yeah we are not going to judge
+[20:03] <Zyle> much
+[20:03] <Maverick> lol ok fine, give me a few minutes to push the latest changes
+[20:04] <Picard> excited
+[20:04] <Lara> same
+[20:05] <Maverick> ok it is at ircreplay.app if you want to poke it
+[20:05] <Maverick> load the demo log first, the button on the dropzone
+[20:05] <Lara> loading
+[20:05] <Tobz> ooh nice landing page
+[20:06] <Squishy> I like the dark theme
+[20:06] <Picard> ok loaded the demo log, this is really cool
+[20:06] <Lara> oh wow the replay mode is great
+[20:07] <Zyle> it is like watching the conversation happen again
+[20:07] <Tobz> the names panel on the right is nice touch
+[20:07] <Maverick> cheers, shows who has op and voice like the real client
+[20:08] <Squishy> tried loading my own logs?
+[20:08] <Maverick> yeah drag and drop your log file onto the dropzone
+[20:08] <Squishy> oh nice that worked straight away
+[20:08] <Lara> loading prophecies logs
+[20:09] <Lara> oh wow 136k messages
+[20:09] <Tobz> haha
+[20:09] <Picard> how fast did that parse?
+[20:09] <Maverick> about 3 seconds on most machines, web worker so it doesnt freeze
+[20:09] <Picard> impressive
+[20:10] <Lara> ok the stats page is great, Squishy you are the top chatter
+[20:10] <Squishy> I KNOW I saw
+[20:10] <Tobz> hahaha
+[20:10] <Zyle> what does the hourly chart look like
+[20:11] <Lara> peak activity 9pm to midnight, no surprise there
+[20:11] <Maverick> classic IRC hours
+[20:11] <Picard> the connections map is really interesting
+[20:12] <Maverick> yeah who mentions who, it needs the bot filter though as ProphServ is all over it
+[20:12] <Lara> yeah you can see the bots polluting it
+[20:12] <Maverick> I will add the bot filter this weekend
+[20:12] <Squishy> honestly Maverick this is really good
+[20:13] <Tobz> agreed, genuinely well done
+[20:13] <Picard> yeah this is legit
+[20:13] <Maverick> cheers guys, still a lot to do but glad it is working
+[20:14] <Lara> the classic theme?! haha
+[20:14] <Maverick> Windows 98 vibes, had to
+[20:14] <Zyle> hahahaha that is perfect
+[20:14] <Tobz> incredibly on brand
+[20:15] <Maverick> it even has the title bar gradient
+[20:15] <Picard> the detail is impressive
+[20:15] <Lara> ok I love this
+[20:16] <Squishy> so what is left to build
+[20:16] <Maverick> bot filter, cloud save, share links, the premium tier stuff
+[20:16] <Maverick> going to use Clerk for auth and Paddle for billing
+[20:17] <Tobz> Paddle is the Merchant of Record one right?
+[20:17] <Maverick> yeah handles VAT and all that, much simpler for a solo dev
+[20:17] <Picard> smart
+[20:17] <Maverick> price point thinking is £3.49 a month or £49.99 lifetime for early adopters
+[20:18] <Squishy> lifetime is good value if the site sticks around
+[20:18] <Maverick> that is the hope
+[20:18] <Lara> I would pay for cloud save honestly
+[20:18] <Maverick> that is basically the test, if my friends would pay for it someone else might
+[20:19] <Tobz> solid logic
+[20:19] <Zyle> right I am going to load my old gaming channel logs
+[20:19] <Zyle> this is going to be either amazing or horrifying
+[20:19] <Lara> probably both
+[20:19] <Squishy> haha
+Session Close: Fri Mar 07 22:31:05 2025
+
+Session Start: Sat Mar 08 10:45:33 2025
+Session Ident: #dev-crew
+[10:45] *** Now talking in #dev-crew
+[10:45] <Zyle> ok I loaded the 2006 to 2011 gaming logs last night
+[10:45] <Maverick> and?
+[10:46] <Zyle> both amazing and horrifying as predicted
+[10:46] <Lara> hahahaha
+[10:46] <Zyle> the word cloud is just full of game names and mild profanity
+[10:46] <Maverick> thats perfect honestly
+[10:47] <Zyle> top chatter was someone called XxDarkKnightxX with 12,000 lines
+[10:47] <Lara> classic 2006 username
+[10:47] <Zyle> I have no memory of who that was
+[10:47] <Maverick> hahaha
+[10:47] <Squishy> just showed up to my morning with this and im crying
+[10:48] <Lara> morning Squish
+[10:48] <Squishy> morning
+[10:48] <Zyle> the activity heatmap is really cool, you can see exactly when people were online
+[10:48] <Maverick> yeah the heatmap was one of the things I was most pleased with
+[10:49] <Zyle> summer 2008 was clearly when everyone had finished their exams
+[10:49] <Zyle> the channel was active all day every day
+[10:49] <Lara> that tracks
+[10:49] <Squishy> peak IRC era
+[10:50] <Maverick> I am working on the bot filter this morning
+[10:50] <Lara> good shout
+[10:50] <Maverick> going to be a dropdown where you tick which nicks are bots and it removes them from all stats
+[10:51] <Squishy> does it need to be manual or can it auto detect?
+[10:51] <Maverick> I thought about auto detect but the risk of false positives is too high, some human ops are very active
+[10:51] <Squishy> fair point
+[10:51] <Zyle> manual is fine takes two seconds
+[10:52] <Maverick> yeah and bots are usually obvious at the top of the sorted list
+[10:52] <Lara> good morning anyone else who shows up
+[10:52] <Shadow> morning
+[10:52] <Picard> morning
+[10:52] <Tobz> morning all
+[10:53] <Shadow> did I see you posted about ircreplay.app to r/irc Mav?
+[10:53] <Maverick> not yet, saving that for when it is more polished
+[10:53] <Shadow> it looked pretty solid last night
+[10:53] <Maverick> getting there, want the premium bits working first so there is actually something to sell
+[10:54] <Picard> makes sense
+[10:54] <Tobz> how is the Clerk auth coming
+[10:54] <Maverick> installed and the sign in button works, just need to wire up the user record in KV
+[10:55] <Tobz> KV as in Cloudflare KV?
+[10:55] <Maverick> yeah, stores the user record and whether they are premium, simple key value thing
+[10:55] <Tobz> nice and simple
+[10:55] <Maverick> when someone subscribes via Paddle the webhook flips isPremium to true in KV
+[10:56] <Shadow> clever
+[10:56] <Picard> webhook verification?
+[10:56] <Maverick> HMAC SHA256 signature check, all done
+[10:56] <Picard> good
+Session Close: Sat Mar 08 12:30:17 2025
+
+Session Start: Sat Mar 08 21:15:00 2025
+Session Ident: #dev-crew
+[21:15] *** Now talking in #dev-crew
+[21:15] <Maverick> bot filter is done!
+[21:15] <Lara> nice one
+[21:15] <Squishy> legend
+[21:16] <Maverick> tick which nicks are bots and all the charts update instantly
+[21:16] <Tobz> live filtering?
+[21:16] <Maverick> yeah useMemo, just recalculates the filtered stats when the exclusion list changes
+[21:16] <Tobz> nice
+[21:17] <Lara> right someone needs to talk about something other than the app
+[21:17] <Maverick> fair
+[21:17] <Shadow> has anyone played anything good lately?
+[21:17] <Squishy> been back on EVE Online actually
+[21:17] <Tobz> oh no
+[21:17] <Squishy> hahaha
+[21:18] <Lara> how much have you lost
+[21:18] <Squishy> a substantial amount
+[21:18] <Maverick> EVE will do that
+[21:18] <Shadow> I have been playing Minecraft with my kids actually
+[21:18] <Lara> that is very wholesome
+[21:18] <Shadow> they are obsessed
+[21:19] <Tobz> classic gateway game
+[21:19] <Shadow> they built an entire village, I am genuinely impressed
+[21:19] <Squishy> kids are scary good at that stuff
+[21:19] <Shadow> right?
+[21:20] <Zyle> anyone watched anything good
+[21:20] <Lara> just finished Severance, what a show
+[21:20] <Tobz> ohh yes so good
+[21:20] <Picard> the concept is brilliant
+[21:20] <Zyle> wait I havent seen that what is it
+[21:21] <Lara> basically your work self and your personal self are surgically separated, you have no memory of one when you are being the other
+[21:21] <Zyle> that sounds terrifying
+[21:21] <Maverick> it is a bit yeah but brilliant
+[21:21] <Squishy> the office stuff is like a fever dream
+[21:22] <Tobz> just watch it Zyle
+[21:22] <Zyle> ok ok adding to the list
+[21:22] <Shadow> the list grows
+[21:22] <Zyle> it always does
+[21:23] <Lara> so should we do a meetup at some point?
+[21:23] <Tobz> oh yeah that is overdue
+[21:23] <Picard> genuinely been ages since I have seen anyone
+[21:23] <Shadow> I would be up for that
+[21:23] <Maverick> same, where though
+[21:24] <Lara> something central, Birmingham maybe?
+[21:24] <Tobz> works for me
+[21:24] <Squishy> I could do Birmingham
+[21:24] <Picard> yeah that is roughly middle for most people I think
+[21:25] <Zyle> I am way up north so everywhere is a trek but Birmingham is fine
+[21:25] <Shadow> same
+[21:25] <Maverick> ok Birmingham, when are people free
+[21:26] <Lara> not April, I have stuff on basically every weekend
+[21:26] <Tobz> May?
+[21:26] <Squishy> May works
+[21:26] <Picard> yeah May is fine for me
+[21:27] <Shadow> same
+[21:27] <Maverick> May it is, I will sort a date
+[21:27] <Zyle> pub crawl?
+[21:27] <Lara> obviously
+Session Close: Sat Mar 08 23:45:12 2025
+
+Session Start: Sun Mar 09 14:30:00 2025
+Session Ident: #dev-crew
+[14:30] *** Now talking in #dev-crew
+[14:30] <Maverick> right cloud save is working in sandbox
+[14:30] <Lara> already?
+[14:30] <Maverick> R2 storage is pretty simple, POST the JSON to a CF function and it writes to R2
+[14:31] <Tobz> and then it shows up in the dashboard?
+[14:31] <Maverick> yeah list is stored in KV as session metadata, the actual JSON is in R2
+[14:31] <Tobz> clean separation
+[14:31] <Shadow> how big are the session files?
+[14:32] <Maverick> depends on the log but the prophecies one is about 8MB
+[14:32] <Shadow> manageable
+[14:32] <Maverick> yeah and R2 has no egress fees which is the main thing
+[14:32] <Lara> sensible choice
+[14:33] <Maverick> share links work too now, /s/userid/sessionid
+[14:33] <Squishy> public? no auth?
+[14:33] <Maverick> yeah public but the URL is two UUIDs so not guessable
+[14:33] <Tobz> and not indexed by search?
+[14:34] <Maverick> robots.txt and noindex meta tag on the share page, plus X-Robots-Tag header from the function
+[14:34] <Tobz> good thinking
+[14:34] <Lara> I was going to say, old IRC logs are quite personal
+[14:34] <Maverick> exactly
+[14:34] <Shadow> my friend said the same thing when I showed him
+[14:35] <Picard> smart to think about that before launch
+[14:35] <Maverick> yeah it came up in testing and we added all the crawl protection
+[14:35] <Maverick> there is a Cloudflare AI crawler block too, GPTBot and all that
+[14:36] <Tobz> belt and braces
+[14:36] <Maverick> right I am thinking of posting to Reddit this week
+[14:36] <Lara> do it!
+[14:36] <Squishy> it is ready
+[14:37] <Maverick> going to write a proper post, explain what it does, show some screenshots
+[14:37] <Shadow> put a share link in the post of some innocuous channel
+[14:37] <Maverick> good shout, I will do a share link of this channel actually, very meta
+[14:37] <Lara> haha full circle
+Session Close: Sun Mar 09 16:15:44 2025
+
+Session Start: Tue Mar 11 22:00:11 2025
+Session Ident: #dev-crew
+[22:00] *** Now talking in #dev-crew
+[22:00] <Maverick> right I posted to r/irc
+[22:00] <Lara> oh exciting!
+[22:01] <Maverick> https://ircreplay.app — if anyone wants to share it
+[22:01] <Tobz> what is the response like
+[22:01] <Maverick> nothing yet, just posted
+[22:01] <Squishy> these things take a bit to get traction
+[22:02] <Picard> how many upvotes?
+[22:02] <Maverick> like 3 lol
+[22:02] <Lara> haha give it time
+[22:02] <Shadow> I upvoted it
+[22:02] <Zyle> same
+[22:02] <Maverick> cheers lads
+[22:03] <Tobz> so what does the share page look like?
+[22:03] <Maverick> full stats, all the charts, the connections map, mood over time, everything
+[22:03] <Maverick> with a Powered by IRCReplay banner at the bottom
+[22:03] <Lara> nice marketing
+[22:03] <Tobz> so anyone who sees a shared link can see the site
+[22:04] <Maverick> exactly, try it free and go pro buttons
+[22:04] <Squishy> clever
+[22:04] <Maverick> also thinking of doing an LTD deal, first 100 customers get lifetime access
+[22:04] <Picard> how much
+[22:05] <Maverick> £49.99 one time
+[22:05] <Tobz> that is actually very reasonable for lifetime
+[22:05] <Lara> yeah especially if the site grows
+[22:05] <Shadow> I would buy that
+[22:05] <Maverick> noted haha
+[22:06] <Squishy> me too honestly
+[22:06] <Picard> same
+[22:06] <Zyle> count me in if I like the site
+[22:06] <Maverick> I appreciate you all
+[22:07] <Lara> we got you Mav
+[22:07] <Tobz> yeah genuinely looks like something people will use
+[22:08] <Maverick> fingers crossed
+[22:09] <Maverick> OH
+[22:09] <Lara> what
+[22:09] <Maverick> 847 unique visitors in the past hour
+[22:09] <Squishy> WHAT
+[22:09] <Tobz> no way
+[22:10] <Lara> it got traction!
+[22:10] <Maverick> must have been picked up somewhere else too, the Reddit post is at 89 upvotes now
+[22:10] <Picard> thats amazing!
+[22:10] <Shadow> told you it was good
+[22:10] <Zyle> ok wow
+[22:10] <Maverick> Scriptserv.com linked to it as well apparently
+[22:11] <Tobz> the old school IRC community is alive and well
+[22:11] <Lara> this is great Mav!
+[22:11] <Maverick> genuinely did not expect this response
+[22:11] <Squishy> you should have, it is a great tool
+[22:12] <Maverick> well I better not break it then
+[22:12] <Lara> haha
+Session Close: Tue Mar 11 23:58:44 2025
+
+Session Start: Wed Mar 12 09:00:22 2025
+Session Ident: #dev-crew
+[09:00] *** Now talking in #dev-crew
+[09:00] <Maverick> morning, 875 unique visitors yesterday
+[09:00] <Lara> woooo
+[09:01] <Tobz> nice
+[09:01] <Shadow> congrats!
+[09:01] <Maverick> and a few people on the waitlist for Pro which is promising
+[09:01] <Picard> yeah this is clearly a niche that needed filling
+[09:01] <Maverick> I think the privacy angle helped, people are hesitant about uploading old logs
+[09:02] <Tobz> makes sense
+[09:02] <Maverick> the fact it all runs in the browser with nothing stored server side is a big selling point
+[09:02] <Lara> yeah I think so
+[09:02] <Shadow> so what is next
+[09:03] <Maverick> need to set up Paddle properly, get the billing working end to end
+[09:03] <Maverick> also need Terms, Privacy and Refund policy pages for Paddle verification
+[09:03] <Lara> ah the legal stuff
+[09:03] <Tobz> boring but necessary
+[09:03] <Maverick> yeah, 14 day refund guarantee I think
+[09:04] <Squishy> generous
+[09:04] <Maverick> it is the right thing to do, if someone is not happy they should get their money back
+[09:04] <Lara> fair
+[09:04] <Tobz> I respect that
+[09:05] <Maverick> right back to work, got to get the subscription flow working
+[09:05] <Lara> good luck!
+Session Close: Wed Mar 12 10:30:15 2025
+
+Session Start: Wed Mar 12 20:45:33 2025
+Session Ident: #dev-crew
+[20:45] *** Now talking in #dev-crew
+[20:45] <Maverick> right the billing webhook is fighting me
+[20:45] <Tobz> what is the issue
+[20:46] <Maverick> signature verification keeps failing
+[20:46] <Tobz> HMAC issue?
+[20:46] <Maverick> was using the notification ID instead of the actual secret key
+[20:46] <Tobz> oh classic
+[20:46] <Maverick> the secret is in the edit page of the notification destination, not visible on creation
+[20:47] <Lara> sounds like a UI design fail on Paddle's end
+[20:47] <Maverick> yeah a bit
+[20:47] <Shadow> what does the actual secret look like
+[20:47] <Maverick> starts with pdl_ntfset_ and then a long random string, it is much longer than the ID
+[20:48] <Tobz> good to know for future reference
+[20:48] <Maverick> also Paddle camelCases the custom data in webhook payloads
+[20:48] <Squishy> what do you mean?
+[20:48] <Maverick> so I send clerk_user_id but the webhook receives clerkUserId
+[20:48] <Tobz> ah yes snake_case to camelCase conversion
+[20:49] <Maverick> yeah so you have to handle both or your webhook cant find the user
+[20:49] <Tobz> noted
+[20:49] <Lara> how annoying
+[20:49] <Maverick> also they use British spelling, subscription.cancelled with double l
+[20:50] <Tobz> hahahaha
+[20:50] <Lara> that is either brilliant or infuriating depending on where you are from
+[20:50] <Maverick> both honestly
+[20:50] <Picard> how long have you been debugging this
+[20:51] <Maverick> a couple hours on and off
+[20:51] <Picard> what is Claude saying about it
+[20:51] <Maverick> it helped narrow down the signature issue, was useful for talking through the HMAC format
+[20:52] <Tobz> interesting use case
+[20:52] <Maverick> it is good for rubber duck debugging basically
+[20:52] <Tobz> haha
+[20:52] <Lara> but rubber duck that can code
+[20:52] <Maverick> exactly
+[20:53] <Shadow> right so is the billing working now or still broken
+[20:53] <Maverick> getting there, the signature is passing now, just testing the full flow
+[20:53] <Shadow> nice progress
+Session Close: Wed Mar 12 22:15:09 2025
+
+Session Start: Thu Mar 13 21:30:44 2025
+Session Ident: #dev-crew
+[21:30] *** Now talking in #dev-crew
+[21:30] <Maverick> BILLING WORKS
+[21:30] <Lara> YES
+[21:30] <Squishy> nice one!!
+[21:31] <Tobz> legend
+[21:31] <Maverick> end to end, payment, webhook, KV flips to isPremium true
+[21:31] <Picard> brilliant
+[21:31] <Shadow> congrats!
+[21:31] <Zyle> woo!
+[21:31] <Maverick> tested subscribe and cancel both working
+[21:32] <Lara> this is getting real
+[21:32] <Maverick> yeah, got the policies written too, Terms, Privacy, Refunds
+[21:32] <Tobz> oh good
+[21:32] <Maverick> 14 day money back as discussed
+[21:33] <Lara> when are you switching to live?
+[21:33] <Maverick> once Paddle verifies my account, they check the policies and stuff
+[21:33] <Squishy> how long does that take
+[21:33] <Maverick> could be a few days, you never know
+[21:34] <Tobz> hopefully quick
+[21:34] <Maverick> yeah, in the meantime going to do the cleanup, remove the coming soon stuff
+[21:34] <Lara> oh right the Pro Coming Soon button everywhere
+[21:34] <Maverick> yeah that was always temporary, now it is just launching
+[21:35] <Picard> exciting
+[21:35] <Shadow> genuinely pleased for you Mav, you put a lot of work in
+[21:35] <Maverick> cheers Shadow, Claude did a lot of the heavy lifting if I am honest
+[21:35] <Tobz> you still had to know what to build and how to put it together
+[21:36] <Maverick> fair point
+[21:36] <Lara> and you had the idea
+[21:36] <Squishy> yeah the idea was the thing
+[21:37] <Maverick> right I am going to celebrate with a beer and then get back to it tomorrow
+[21:37] <Lara> you deserve it!
+[21:37] <Tobz> earned it mate
+[21:37] <Squishy> cheers Mav
+[21:37] <Picard> congrats again
+Session Close: Thu Mar 13 23:30:22 2025
+
+Session Start: Fri Mar 14 10:00:15 2025
+Session Ident: #dev-crew
+[10:00] *** Now talking in #dev-crew
+[10:00] <Maverick> Paddle verified overnight
+[10:00] <Lara> ALREADY
+[10:00] <Maverick> yeah I know, did not expect that
+[10:00] <Tobz> nice one
+[10:01] <Shadow> so you are live?
+[10:01] <Maverick> switching to live credentials now
+[10:01] <Lara> eek exciting
+[10:02] <Maverick> also setting up Clerk production instance, that involves some DNS faff
+[10:02] <Tobz> CNAME records?
+[10:02] <Maverick> yeah, they have to be DNS only not proxied, took me a minute to figure that out
+[10:02] <Tobz> ah yeah Cloudflare proxy would break it
+[10:02] <Maverick> exactly
+[10:03] <Squishy> morning
+[10:03] <Lara> morning! Maverick is going live
+[10:03] <Squishy> TODAY?
+[10:03] <Maverick> today
+[10:03] <Squishy> oh wow
+[10:04] <Picard> congrats in advance
+[10:04] <Zyle> exciting!
+[10:04] <Shadow> proud of you mate
+[10:04] <Maverick> cheers, right give me an hour and it should all be switched over
+[10:05] <Lara> we will wait here
+[10:05] <Tobz> hovering intensifies
+Session Close: Fri Mar 14 11:15:33 2025
+
+Session Start: Fri Mar 14 12:30:44 2025
+Session Ident: #dev-crew
+[12:30] *** Now talking in #dev-crew
+[12:30] <Maverick> WE ARE LIVE
+[12:30] <Lara> YESSSSS
+[12:30] <Tobz> COME ON
+[12:30] <Squishy> LETS GOOO
+[12:30] <Zyle> AMAZING
+[12:31] <Picard> brilliant!
+[12:31] <Shadow> congrats Maverick!
+[12:31] <Maverick> real Paddle, real Clerk, real payments, everything working
+[12:31] <Lara> I am going to go buy a lifetime deal right now
+[12:31] <Maverick> Lara no you dont have to
+[12:32] <Lara> I want to, I have been testing this thing for weeks
+[12:32] <Tobz> same honestly
+[12:32] <Squishy> yeah getting the LTD
+[12:32] <Maverick> you are all too good
+[12:32] <Picard> genuinely a great product, worth paying for
+[12:33] <Shadow> going monthly to start, want to try the cloud save properly
+[12:33] <Zyle> same
+[12:33] <Maverick> means a lot seriously
+[12:34] <Lara> right I am going to post the share link of this channel on the reddit thread
+[12:34] <Maverick> haha full circle
+[12:34] <Tobz> meta as hell
+[12:34] <Lara> https://ircreplay.app - go check out the share link of the channel where we built it lol
+[12:34] <Squishy> that is amazing
+[12:35] <Picard> genuinely love that
+[12:35] <Shadow> the best marketing
+[12:35] <Maverick> right I am going to write the Reddit launch post
+[12:35] <Lara> good luck!
+[12:35] <Tobz> let us know if it takes off
+[12:36] <Maverick> will do, cheers everyone, could not have done it without the testing and feedback
+[12:36] <Squishy> you absolutely could have but we were glad to help
+[12:36] <Lara> what Squish said
+[12:36] <Shadow> go get them
+[12:36] <Zyle> legendary
+Session Close: Fri Mar 14 14:00:07 2025
+
+Session Start: Fri Mar 14 20:15:22 2025
+Session Ident: #dev-crew
+[20:15] *** Now talking in #dev-crew
+[20:15] <Maverick> reddit post is getting traction
+[20:15] <Lara> how many upvotes
+[20:15] <Maverick> 340 and climbing
+[20:15] <Squishy> WOW
+[20:16] <Tobz> that is a lot for r/irc
+[20:16] <Maverick> yeah it is pretty niche but apparently the IRC community is alive and nostalgic
+[20:16] <Picard> comments?
+[20:17] <Maverick> loads, mostly people saying they have old logs they never knew what to do with
+[20:17] <Lara> exactly the audience
+[20:17] <Shadow> anyone complaining?
+[20:17] <Maverick> one person said they wished it was open source
+[20:17] <Tobz> the eternal request
+[20:17] <Zyle> it is though right?
+[20:18] <Maverick> yeah the repo is public, just not fully open source licensed
+[20:18] <Tobz> fair enough
+[20:18] <Maverick> someone else asked about irssi support
+[20:18] <Lara> oh is that a different format?
+[20:18] <Maverick> yeah, I need some irssi logs to build it, anyone got any?
+[20:19] <Shadow> I might have some, will look
+[20:19] <Picard> I definitely have some somewhere
+[20:19] <Maverick> would be very helpful if you can find them
+[20:20] <Squishy> so how many sign ups today
+[20:20] <Maverick> 23 new accounts, 4 Pro conversions already
+[20:20] <Lara> 4 paying customers on day one!
+[20:20] <Tobz> that is a great start
+[20:20] <Squishy> yeah first day conversions are hard
+[20:20] <Maverick> two monthly, one annual, one lifetime
+[20:21] <Picard> the lifetime is from us lot or a stranger?
+[20:21] <Maverick> stranger!
+[20:21] <Lara> amazing
+[20:21] <Tobz> that is the one that counts
+[20:21] <Shadow> congrats Mav
+[20:21] <Maverick> genuinely chuffed
+[20:22] <Zyle> right this calls for a proper celebration at the Birmingham meetup
+[20:22] <Lara> oh absolutely
+[20:22] <Tobz> first round on Maverick
+[20:22] <Maverick> deal
+[20:22] <Squishy> we are holding you to that
+[20:23] <Maverick> worth every penny
+[20:23] <Picard> right here is to ircreplay.app, genuinely brilliant work
+[20:23] <Lara> cheers!
+[20:23] <Tobz> cheers mate
+[20:23] <Shadow> cheers!
+[20:23] <Squishy> cheers!
+[20:23] <Zyle> cheers!
+[20:23] <Maverick> cheers everyone, this one is for the old channels
+[20:24] <Lara> for the old channels!
+[20:24] <Tobz> for the old channels
+Session Close: Fri Mar 14 22:45:33 2025
