@@ -52,10 +52,9 @@ async function handleList(userId, env) {
 
 async function handleGetDownloadUrl(userId, sessionId, env) {
   const key = `${userId}/${sessionId}.json`
-  const url = await env.IRCREPLAY_R2.createSignedUrl({
-    method: 'GET',
+  const url = await env.IRCREPLAY_R2.createSignedUrl(key, {
     expiresIn: 3600,
-    key,
+    httpMethod: 'GET',
   })
   return new Response(JSON.stringify({ url }), { status: 200, headers: HEADERS })
 }
@@ -90,11 +89,9 @@ async function handleGetUploadUrl(userId, body, env) {
   const key       = `${userId}/${sessionId}.json`
 
   // Generate presigned PUT URL — client uploads directly to R2
-  const url = await env.IRCREPLAY_R2.createSignedUrl({
-    method: 'PUT',
-    expiresIn: 300, // 5 minutes to complete the upload
-    key,
-    httpMetadata: { contentType: 'application/json' },
+  const url = await env.IRCREPLAY_R2.createSignedUrl(key, {
+    expiresIn: 300,
+    httpMethod: 'PUT',
   })
 
   // Record session metadata in KV

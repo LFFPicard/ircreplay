@@ -286,17 +286,6 @@ function Nav({ isMobile }) {
 
       <div className="ml-auto flex items-center gap-3">
 
-        {/* Save session button */}
-        {canSave && (
-          <button
-            onClick={handleSave}
-            title="Save session as JSON — reload later without re-uploading logs"
-            className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            💾 Save Session
-          </button>
-        )}
-
         {/* Save session buttons */}
         {canSave && (
           <button
