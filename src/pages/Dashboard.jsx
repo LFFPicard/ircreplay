@@ -47,14 +47,15 @@ function Dashboard() {
   const handleRestore = async (session) => {
     setRestoring(session.id)
     try {
-      // Get presigned download URL
-      const res  = await fetch(`/api/logs?id=${session.id}`, { headers: { 'X-User-Id': userId } })
-      const data = await res.json()
-      if (!data.url) throw new Error('No download URL')
+      // GET the session JSON directly from the function
+      const res = await fetch(`/api/logs?id=${session.id}`, {
+        headers: { 'X-User-Id': userId },
+      })
 
-      // Fetch the JSON from R2
-      const jsonRes  = await fetch(data.url)
-      const jsonText = await jsonRes.text()
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+      const jsonText = await res.text()
+      console.log('Restore response length:', jsonText.length)
 
       // Restore via existing loadSession utility
       const restored = loadSession(jsonText)
@@ -62,7 +63,8 @@ function Dashboard() {
 
       // Navigate to viewer
       window.location.href = '/'
-    } catch {
+    } catch (err) {
+      console.error('Restore failed:', err)
       setError('Failed to restore session')
     } finally {
       setRestoring(null)
