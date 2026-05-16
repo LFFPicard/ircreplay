@@ -18,6 +18,11 @@ function Viewer() {
   useEffect(() => {
     return () => workerRef.current?.terminate()
   }, [])
+  useEffect(() => {
+    if (session?.mode) {
+      setMode(session.mode)
+    }
+  }, [session])
 
   const handleFilesStart = useCallback((filenames) => {
     setLoadingFiles(filenames)

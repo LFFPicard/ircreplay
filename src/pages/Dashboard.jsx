@@ -46,24 +46,16 @@ function Dashboard() {
     }
   }
 
-  const handleRestore = async (session) => {
+    const handleRestore = async (session, mode = 'instant') => {
     setRestoring(session.id)
     try {
-      // GET the session JSON directly from the function
       const res = await fetch(`/api/logs?id=${session.id}`, {
         headers: { 'X-User-Id': userId },
       })
-
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-
       const jsonText = await res.text()
-      console.log('Restore response length:', jsonText.length)
-
-      // Restore via existing loadSession utility
       const restored = loadSession(jsonText)
-      setSession(restored)
-
-      // Navigate to viewer
+      restored.mode = mode
       setSession(restored)
       navigate('/')
     } catch (err) {
@@ -148,11 +140,18 @@ function Dashboard() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
-                    onClick={() => handleRestore(session)}
+                    onClick={() => handleRestore(session, 'instant')}
                     disabled={restoring === session.id}
                     className="bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
                   >
-                    {restoring === session.id ? 'Loading...' : '▶ Load'}
+                    {restoring === session.id ? 'Loading...' : '⚡ Instant'}
+                  </button>
+                  <button
+                    onClick={() => handleRestore(session, 'replay')}
+                    disabled={restoring === session.id}
+                    className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    {restoring === session.id ? '...' : '▶ Replay'}
                   </button>
                   <button
                     onClick={() => handleDelete(session)}
