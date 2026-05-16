@@ -124,14 +124,18 @@ self.onmessage = ({ data: { events } }) => {
   const messagesByDay = [[]]
   let lastHourSeen = -1
   for (const e of messages) {
-    if (!e.timestamp) { messagesByDay[messagesByDay.length - 1].push(e); continue }
-    const hour = parseInt(e.timestamp.split(':')[0], 10)
-    if (!isNaN(hour)) {
-      if (lastHourSeen > 20 && hour < 4) messagesByDay.push([])
-      lastHourSeen = hour
+  if (!e.timestamp) { messagesByDay[messagesByDay.length - 1].push(e); continue }
+  const hour = parseInt(e.timestamp.split(':')[0], 10)
+  if (!isNaN(hour)) {
+    // New day if: classic midnight rollover OR hour goes backwards by more than 2 hours
+    const hourDiff = lastHourSeen === -1 ? 0 : hour - lastHourSeen
+    if ((lastHourSeen > 20 && hour < 4) || (lastHourSeen !== -1 && hourDiff < -2)) {
+      messagesByDay.push([])
     }
-    messagesByDay[messagesByDay.length - 1].push(e)
+    lastHourSeen = hour
   }
+  messagesByDay[messagesByDay.length - 1].push(e)
+}
 
   // ── ACTIVITY HEATMAP — day x hour grid ───────────────────────────
   // Cap at 60 days for performance, aggregate older days into weeks
