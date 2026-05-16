@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, useRef, Fragment, useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Legend } from 'recharts'
 import { useSession } from '../context/SessionContext'
 import { useUser } from '../context/UserContext'
@@ -30,6 +30,86 @@ function ProGate({ children, title }) {
       <div className="opacity-20 pointer-events-none select-none">
         {children}
       </div>
+    </div>
+  )
+}
+
+// ── BOT FILTER ────────────────────────────────────────────────────────
+
+function BotFilter({ nicks, excluded, onToggle, isPremium }) {
+  const [open,   setOpen  ] = useState(false)
+  const [search, setSearch] = useState('')
+
+  if (!isPremium) {
+    return (
+      <div className="flex items-center justify-center gap-3 bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2">
+        <span className="text-gray-600 text-xs">🔒</span>
+        <span className="text-gray-600 text-xs font-mono">Bot Filter — exclude bots from all stats</span>
+        <a href="/pricing" className="text-yellow-500 text-xs hover:text-yellow-400 transition-colors font-semibold">&#9889; Pro</a>
+      </div>
+    )
+  }
+
+  const filtered = nicks.filter(n => n.toLowerCase().includes(search.toLowerCase()))
+  const exCount  = excluded.size
+
+  return (
+    <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-700/50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-gray-400 text-sm font-semibold">Bot Filter</span>
+          {exCount > 0 && (
+            <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs px-2 py-0.5 rounded-full font-mono">
+              {exCount} excluded
+            </span>
+          )}
+          {exCount === 0 && (
+            <span className="text-gray-600 text-xs">exclude bots from all stats</span>
+          )}
+        </div>
+        <span className="text-gray-500 text-xs">{open ? '▲ close' : '▼ open'}</span>
+      </button>
+
+      {open && (
+        <div className="border-t border-gray-700 p-4 space-y-3">
+          <p className="text-gray-500 text-xs">Select nicks to exclude from all stats. Sorted by activity — bots are usually near the top.</p>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search nicks..."
+            className="w-full bg-gray-900 border border-gray-600 focus:border-yellow-500 rounded-lg px-3 py-1.5 text-white text-sm font-mono outline-none transition-colors placeholder-gray-600"
+          />
+          <div className="max-h-48 overflow-y-auto space-y-1">
+            {filtered.map(nick => {
+              const isExcluded = excluded.has(nick)
+              const rowClass   = isExcluded
+                ? 'flex items-center gap-2 px-2 py-1 rounded cursor-pointer bg-yellow-500/10 border border-yellow-500/20'
+                : 'flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-700/50'
+              return (
+                <div key={nick} onClick={() => onToggle(nick)} className={rowClass}>
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isExcluded ? 'bg-yellow-500 border-yellow-500' : 'border-gray-600'}`}>
+                    {isExcluded && <span className="text-black text-xs font-bold">&#10003;</span>}
+                  </div>
+                  <span className={`font-mono text-sm ${isExcluded ? 'text-yellow-400 line-through' : 'text-gray-300'}`}>{nick}</span>
+                  {isExcluded && <span className="text-gray-600 text-xs ml-auto">excluded</span>}
+                </div>
+              )
+            })}
+          </div>
+          {exCount > 0 && (
+            <button
+              onClick={() => { excluded.forEach(n => onToggle(n)) }}
+              className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+            >
+              Clear all exclusions
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -112,7 +192,7 @@ function TimeOfDay({ timeOfDay }) {
             <div className="text-gray-400 text-xs font-semibold">{s.label}</div>
             <div className="text-gray-400 text-xs mb-2">Hours {s.sub}</div>
             {timeOfDay[s.key].length === 0
-              ? <div className="text-gray-400 text-xs">No activity</div>
+              ? <div className="text-gray-700 text-xs">No activity</div>
               : timeOfDay[s.key].map((n, i) => (
                 <div key={n.nick} className="flex items-center justify-between text-xs mb-0.5">
                   <span className={`font-mono truncate ${i === 0 ? 'text-green-400' : 'text-gray-400'}`}>{n.nick}</span>
@@ -174,7 +254,7 @@ function NickProfile({ chatter, onClose }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
         {clickableStats.map(s => {
-          const isActive = showSamples === s.key
+          const isActive  = showSamples === s.key
           const cardClass = isActive
             ? 'bg-gray-700 border-green-500/50'
             : 'bg-gray-800 border-transparent hover:border-green-500/30 hover:bg-gray-700'
@@ -239,7 +319,7 @@ function TopChatters({ topChatters }) {
           <tbody>
             {displayed.map((chatter) => {
               const isSelected = selected === chatter.nick
-              const rowClass = isSelected
+              const rowClass   = isSelected
                 ? 'border-b border-gray-700/50 cursor-pointer transition-colors bg-green-900/20'
                 : 'border-b border-gray-700/50 cursor-pointer transition-colors hover:bg-gray-700/50'
               return (
@@ -311,9 +391,9 @@ function WordStats({ topWords }) {
 function UrlList({ urls }) {
   const [showAll, setShowAll] = useState(false)
   if (urls.length === 0) return null
-  const displayed  = showAll ? urls : urls.slice(0, 10)
-  const hasMore    = urls.length > 10
-  const moreLabel  = `Show all ${urls.length} URLs`
+  const displayed = showAll ? urls : urls.slice(0, 10)
+  const hasMore   = urls.length > 10
+  const moreLabel = `Show all ${urls.length} URLs`
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <h3 className="text-gray-300 font-semibold mb-3">URLs Shared ({urls.length.toLocaleString()})</h3>
@@ -350,7 +430,7 @@ function ActivityHeatmap({ heatmap }) {
     return '#22c55e'
   }
 
-  const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+  const hours    = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
   const showDays = heatmap.slice(-30)
 
   return (
@@ -404,7 +484,7 @@ function NickActivityChart({ nickActivityData, top5nicks }) {
       <p className="text-gray-500 text-xs mb-3">Daily message counts for the top 5 most active users</p>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={showData} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
-          <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 10 }} label={{ value: 'Day', position: 'insideBottom', fill: '#6b7280', fontSize: 10 }} />
+          <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 10 }} />
           <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
           <Tooltip
             contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '6px' }}
@@ -423,7 +503,7 @@ function NickActivityChart({ nickActivityData, top5nicks }) {
 
 function WordCloud({ topWords }) {
   if (!topWords || topWords.length === 0) return null
-  const maxCount  = topWords[0]?.count || 1
+  const maxCount   = topWords[0]?.count || 1
   const cloudWords = topWords.slice(0, 60)
 
   const getSize = (count) => {
@@ -566,14 +646,49 @@ function ChannelMoodChart({ moodData }) {
 function Stats() {
   const { session, setStats: setStatsCtx } = useSession()
   const { isPremium } = useUser()
-  const [stats,   setStats  ] = useState(null)
+  const [stats,   setStats  ] = useState(null)    // line ~530 — raw stats from worker
   const [loading, setLoading] = useState(false)
+  const [excluded, setExcluded] = useState(new Set()) // line ~532 — bot exclusion set
   const workerRef = useRef(null)
+
+  // Recompute filtered stats whenever raw stats or excluded set changes
+  // line ~536
+  const filteredStats = useMemo(() => {
+    if (!stats) return null
+    return {
+      ...stats,
+      topChatters: stats.topChatters.filter(c => !excluded.has(c.nick)),
+      urls:        stats.urls.filter(u => !excluded.has(u.nick)),
+      topMentions: stats.topMentions?.filter(m => !excluded.has(m.from) && !excluded.has(m.to)),
+      topStarters: stats.topStarters?.filter(s => !excluded.has(s.nick)),
+      summary: {
+        ...stats.summary,
+        uniqueChatters: stats.topChatters.filter(c => !excluded.has(c.nick)).length,
+      },
+    }
+  }, [stats, excluded])
+
+  // Nicks sorted by activity for the bot filter panel
+  // line ~553
+  const nicksByActivity = useMemo(() => {
+    if (!stats) return []
+    return stats.topChatters.map(c => c.nick)
+  }, [stats])
+
+  const toggleExcluded = (nick) => {
+    setExcluded(prev => {
+      const next = new Set(prev)
+      if (next.has(nick)) next.delete(nick)
+      else next.add(nick)
+      return next
+    })
+  }
 
   useEffect(() => {
     if (!session) { setStats(null); return }
     setLoading(true)
     setStats(null)
+    setExcluded(new Set()) // reset exclusions when new session loaded
     workerRef.current?.terminate()
     const worker = new StatsWorker()
     workerRef.current = worker
@@ -639,16 +754,24 @@ function Stats() {
           </div>
         </div>
 
-        {/* Free stats */}
-        <OverviewCards summary={stats.summary} />
+        {/* Bot filter — sits above all stats */}
+        <BotFilter
+          nicks={nicksByActivity}
+          excluded={excluded}
+          onToggle={toggleExcluded}
+          isPremium={isPremium}
+        />
+
+        {/* Free stats — all use filteredStats */}
+        <OverviewCards summary={filteredStats.summary} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <HourlyChart hourly={stats.hourly} />
-          <TimeOfDay timeOfDay={stats.timeOfDay} />
+          <HourlyChart hourly={filteredStats.hourly} />
+          <TimeOfDay timeOfDay={filteredStats.timeOfDay} />
         </div>
-        <TopChatters topChatters={stats.topChatters} />
+        <TopChatters topChatters={filteredStats.topChatters} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <WordStats topWords={stats.topWords} />
-          <UrlList urls={stats.urls} />
+          <WordStats topWords={filteredStats.topWords} />
+          <UrlList urls={filteredStats.urls} />
         </div>
 
         {/* Pro stats divider */}
@@ -660,43 +783,43 @@ function Stats() {
 
         {/* Activity heatmap */}
         {isPremium
-          ? <ActivityHeatmap heatmap={stats.heatmap} />
+          ? <ActivityHeatmap heatmap={filteredStats.heatmap} />
           : <ProGate title="Activity Heatmap"><ActivityHeatmap heatmap={stats.heatmap} /></ProGate>
         }
 
         {/* Nick activity over time */}
         {isPremium
-          ? <NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} />
+          ? <NickActivityChart nickActivityData={filteredStats.nickActivityData} top5nicks={filteredStats.top5nicks} />
           : <ProGate title="Top Chatters Over Time"><NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} /></ProGate>
         }
 
         {/* Word cloud + emoticons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {isPremium
-          ? <WordCloud topWords={stats.topWords} />
-          : <ProGate title="Word Cloud"><WordCloud topWords={stats.topWords} /></ProGate>
-        }
-        {isPremium
-          ? <EmoticonStats topEmoticons={stats.topEmoticons} />
-          : <ProGate title="Emoji &amp; Emoticon Stats"><EmoticonStats topEmoticons={stats.topEmoticons} /></ProGate>
-        }
+          {isPremium
+            ? <WordCloud topWords={filteredStats.topWords} />
+            : <ProGate title="Word Cloud"><WordCloud topWords={stats.topWords} /></ProGate>
+          }
+          {isPremium
+            ? <EmoticonStats topEmoticons={filteredStats.topEmoticons} />
+            : <ProGate title="Emoji &amp; Emoticon Stats"><EmoticonStats topEmoticons={stats.topEmoticons} /></ProGate>
+          }
         </div>
 
         {/* Connections + conversation starters */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {isPremium
-          ? <RelationshipMap topMentions={stats.topMentions} />
-          : <ProGate title="Connections Map"><RelationshipMap topMentions={stats.topMentions} /></ProGate>
-        }
-        {isPremium
-          ? <ConversationStarters topStarters={stats.topStarters} />
-          : <ProGate title="Conversation Starters"><ConversationStarters topStarters={stats.topStarters} /></ProGate>
-        }
+          {isPremium
+            ? <RelationshipMap topMentions={filteredStats.topMentions} />
+            : <ProGate title="Connections Map"><RelationshipMap topMentions={stats.topMentions} /></ProGate>
+          }
+          {isPremium
+            ? <ConversationStarters topStarters={filteredStats.topStarters} />
+            : <ProGate title="Conversation Starters"><ConversationStarters topStarters={stats.topStarters} /></ProGate>
+          }
         </div>
 
         {/* Channel mood */}
         {isPremium
-          ? <ChannelMoodChart moodData={stats.moodData} />
+          ? <ChannelMoodChart moodData={filteredStats.moodData} />
           : <ProGate title="Channel Mood Over Time"><ChannelMoodChart moodData={stats.moodData} /></ProGate>
         }
 
