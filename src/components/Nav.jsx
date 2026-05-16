@@ -19,23 +19,40 @@ const THEMES_MOBILE = [
 ]
 
 const NAV_LINKS = [
-  { to: '/',      label: 'Viewer' },
-  { to: '/stats', label: 'Stats'  },
-  { to: '/about', label: 'About'  },
-  { to: '/help',  label: 'Help'   },
-  { to: '/links', label: 'Links'  },
+  { to: '/',        label: 'Viewer'  },
+  { to: '/stats',   label: 'Stats'   },
+  { to: '/about',   label: 'About'   },
+  { to: '/help',    label: 'Help'    },
+  { to: '/links',   label: 'Links'   },
   { to: '/pricing', label: 'Pricing' },
 ]
 
+// ── CLOUD SAVE OVERLAY ────────────────────────────────────────────────
+
+function CloudSaveOverlay({ visible }) {
+  if (!visible) return null
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl px-10 py-8 flex flex-col items-center gap-4 shadow-2xl">
+        <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin" />
+        <p className="text-white font-mono font-semibold text-lg">Saving to cloud...</p>
+        <p className="text-gray-400 text-sm">This may take a moment for large logs</p>
+      </div>
+    </div>
+  )
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────
+
 function Nav({ isMobile }) {
-  const { theme, setTheme }   = useTheme()
-  const { session, stats }    = useSession()
-  const navigate              = useNavigate()
+  const { theme, setTheme }     = useTheme()
+  const { session, stats }      = useSession()
+  const navigate                = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [exportMode, setExportMode] = useState('html')
   const [cloudSaving, setCloudSaving] = useState(false)
-  const { userId }        = useAuth()
-  const { isPremium }     = useUser()
+  const { userId }    = useAuth()
+  const { isPremium } = useUser()
 
   const canExport = session && stats
   const canSave   = !!session
@@ -114,29 +131,23 @@ function Nav({ isMobile }) {
   if (isMobile) {
     return (
       <>
+        <CloudSaveOverlay visible={cloudSaving} />
         <nav className="flex items-center justify-between px-4 py-3 bg-gray-900 text-white shrink-0">
-          {/* Logo */}
           <span className="font-bold text-lg text-green-400">IRCReplay</span>
-
           <div className="flex items-center gap-2">
-            {/* Mobile theme switcher — Light/Dark only */}
             <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
               {THEMES_MOBILE.map(t => (
                 <button
                   key={t.id}
                   onClick={() => setTheme(t.id)}
                   className={`px-2 py-1 rounded-md text-sm transition-colors ${
-                    theme === t.id
-                      ? 'bg-green-500 text-black font-semibold'
-                      : 'text-gray-400 hover:text-white'
+                    theme === t.id ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
-
-            {/* Hamburger button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex flex-col justify-center items-center w-8 h-8 gap-1.5 text-gray-300 hover:text-white"
@@ -149,10 +160,8 @@ function Nav({ isMobile }) {
           </div>
         </nav>
 
-        {/* Mobile dropdown menu */}
         {menuOpen && (
           <div className="bg-gray-900 border-t border-gray-700 flex flex-col shrink-0">
-            {/* Nav links */}
             {NAV_LINKS.map(link => (
               <button
                 key={link.to}
@@ -172,15 +181,13 @@ function Nav({ isMobile }) {
               </button>
             )}
 
-            {/* Pro button in mobile menu */}
             <button
               onClick={() => handleNavClick('/pro')}
               className="text-left px-6 py-3 text-yellow-400 hover:bg-yellow-500/10 transition-colors border-b border-gray-800 text-sm font-bold"
             >
-              ⚡ Pro — Coming Soon
+              &#9889; Pro &mdash; Coming Soon
             </button>
 
-           {/* Auth buttons in mobile menu */}
             <Show when="signed-out">
               <SignInButton mode="modal">
                 <button className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm w-full">
@@ -202,25 +209,25 @@ function Nav({ isMobile }) {
               </div>
             </Show>
 
-            {/* Save / Export in menu on mobile */}
             {canSave && (
               <button
                 onClick={() => { handleSave(); setMenuOpen(false) }}
                 className="text-left px-6 py-3 text-gray-300 hover:text-green-400 hover:bg-gray-800 transition-colors border-b border-gray-800 text-sm"
               >
-                💾 Save Session
+                &#128190; Save Session
               </button>
             )}
-          {canSave && isPremium && userId && (
-          <button
-            onClick={handleCloudSave}
-            disabled={cloudSaving}
-            title="Save session to cloud — access from any device"
-            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 disabled:opacity-50 disabled:cursor-wait text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            {cloudSaving ? '☁️ Saving...' : '☁️ Cloud Save'}
-          </button>
-        )}
+
+            {canSave && isPremium && userId && (
+              <button
+                onClick={() => { handleCloudSave(); setMenuOpen(false) }}
+                disabled={cloudSaving}
+                className="text-left px-6 py-3 text-blue-400 hover:bg-blue-500/10 transition-colors border-b border-gray-800 text-sm disabled:opacity-50"
+              >
+                &#9729;&#65039; Cloud Save
+              </button>
+            )}
+
             {canExport && (
               <div className="px-6 py-3 border-b border-gray-800 flex items-center gap-2">
                 <span className="text-gray-400 text-sm">Export:</span>
@@ -229,9 +236,7 @@ function Nav({ isMobile }) {
                     key={m}
                     onClick={() => setExportMode(m)}
                     className={`px-2 py-0.5 rounded text-xs font-mono uppercase transition-colors ${
-                      exportMode === m
-                        ? 'bg-green-500 text-black font-semibold'
-                        : 'text-gray-400 hover:text-white bg-gray-800'
+                      exportMode === m ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white bg-gray-800'
                     }`}
                   >
                     {m}
@@ -241,7 +246,7 @@ function Nav({ isMobile }) {
                   onClick={() => { handleExport(); setMenuOpen(false) }}
                   className="bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1 rounded-lg transition-colors"
                 >
-                  ↓ Export
+                  &#8595; Export
                 </button>
               </div>
             )}
@@ -253,122 +258,116 @@ function Nav({ isMobile }) {
 
   // ── DESKTOP NAV ──────────────────────────────────────────────────
   return (
-    <nav className="flex items-center gap-6 px-6 py-4 bg-gray-900 text-white shrink-0">
-      {/* Logo */}
-      <span className="font-bold text-lg text-green-400 mr-4">IRCReplay</span>
+    <>
+      <CloudSaveOverlay visible={cloudSaving} />
+      <nav className="flex items-center gap-6 px-6 py-4 bg-gray-900 text-white shrink-0">
+        <span className="font-bold text-lg text-green-400 mr-4">IRCReplay</span>
 
-      {/* Nav links */}
-      {NAV_LINKS.map(link => (
-        <NavLink key={link.to} to={link.to} className={linkClass}>
-          {link.label}
-        </NavLink>
-      ))}
-      {isPremium && userId && (
-        <NavLink to="/dashboard" className={linkClass}>
-          Dashboard
-        </NavLink>
-      )}
+        {NAV_LINKS.map(link => (
+          <NavLink key={link.to} to={link.to} className={linkClass}>
+            {link.label}
+          </NavLink>
+        ))}
 
-      {/* Pro coming soon button */}
-      <NavLink
-        to="/pro"
-        className={({ isActive }) =>
-          isActive
-            ? 'bg-yellow-500 text-black text-xs font-bold px-3 py-1.5 rounded-lg'
-            : 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors'
-        }
-      >
-        ⚡ Pro — Coming Soon
-      </NavLink>
-
-      <div className="ml-auto flex items-center gap-3">
-
-        {/* Save session buttons */}
-        {canSave && (
-          <button
-            onClick={handleSave}
-            title="Save session as JSON — reload later without re-uploading logs"
-            className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            💾 Save
-          </button>
-        )}
-        {canSave && isPremium && userId && (
-          <button
-            onClick={handleCloudSave}
-            disabled={cloudSaving}
-            title="Save session to cloud — access from any device"
-            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 disabled:opacity-50 disabled:cursor-wait text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            {cloudSaving ? '☁️ Saving...' : '☁️ Cloud Save'}
-          </button>
+        {isPremium && userId && (
+          <NavLink to="/dashboard" className={linkClass}>
+            Dashboard
+          </NavLink>
         )}
 
-        {/* Export controls */}
-        {canExport && (
-          <div className="flex items-center gap-1">
-            <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
-              {['html', 'pdf'].map(m => (
-                <button
-                  key={m}
-                  onClick={() => setExportMode(m)}
-                  className={`px-2 py-1 rounded-md text-xs font-mono transition-colors uppercase ${
-                    exportMode === m
-                      ? 'bg-green-500 text-black font-semibold'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
+        <NavLink
+          to="/pro"
+          className={({ isActive }) =>
+            isActive
+              ? 'bg-yellow-500 text-black text-xs font-bold px-3 py-1.5 rounded-lg'
+              : 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors'
+          }
+        >
+          &#9889; Pro &mdash; Coming Soon
+        </NavLink>
+
+        <div className="ml-auto flex items-center gap-3">
+
+          {canSave && (
+            <button
+              onClick={handleSave}
+              title="Save session as JSON — reload later without re-uploading logs"
+              className="flex items-center gap-1.5 text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              &#128190; Save
+            </button>
+          )}
+
+          {canSave && isPremium && userId && (
+            <button
+              onClick={handleCloudSave}
+              disabled={cloudSaving}
+              title="Save session to cloud — access from any device"
+              className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 disabled:opacity-50 disabled:cursor-wait text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              &#9729;&#65039; Cloud Save
+            </button>
+          )}
+
+          {canExport && (
+            <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
+                {['html', 'pdf'].map(m => (
+                  <button
+                    key={m}
+                    onClick={() => setExportMode(m)}
+                    className={`px-2 py-1 rounded-md text-xs font-mono transition-colors uppercase ${
+                      exportMode === m ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-1.5 bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              >
+                &#8595; Export
+              </button>
             </div>
-            <button
-              onClick={handleExport}
-              className="flex items-center gap-1.5 bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-            >
-              ↓ Export
-            </button>
+          )}
+
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                Sign In
+              </button>
+            </SignInButton>
+            {/* SIGN UP — uncomment when Pro launches
+            <SignUpButton mode="modal">
+              <button className="bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                Sign Up
+              </button>
+            </SignUpButton>
+            */}
+          </Show>
+          <Show when="signed-in">
+            <UserButton afterSignOutUrl="/" />
+          </Show>
+
+          <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
+            {THEMES_DESKTOP.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id)}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                  theme === t.id ? 'bg-green-500 text-black font-semibold' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
-        )}
 
-        {/* Auth buttons */}
-        <Show when="signed-out">
-          <SignInButton mode="modal">
-            <button className="text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
-              Sign In
-            </button>
-          </SignInButton>
-          {/* SIGN UP — uncomment when Pro launches
-          <SignUpButton mode="modal">
-            <button className="bg-green-500 hover:bg-green-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
-              Sign Up
-            </button>
-          </SignUpButton>
-          */}
-        </Show>
-        <Show when="signed-in">
-          <UserButton afterSignOutUrl="/" />
-        </Show>
-
-        {/* Theme switcher */}
-        <div className="flex items-center gap-1 bg-gray-800 rounded-lg p-1">
-          {THEMES_DESKTOP.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTheme(t.id)}
-              className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                theme === t.id
-                  ? 'bg-green-500 text-black font-semibold'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
-
-      </div>
-    </nav>
+      </nav>
+    </>
   )
 }
 
