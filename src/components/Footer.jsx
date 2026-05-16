@@ -12,8 +12,8 @@ function Footer() {
         <a href="/privacy" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Privacy</a>
         <a href="/refunds" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Refunds</a>
         <span className="text-green-400 text-xs hidden lg:block whitespace-nowrap">Keep the lights on:</span>
-        <a href="https://ko-fi.com/baggins83" target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">Ko-fi</a>
-        <a href="https://www.paypal.com/paypalme/garyt83" target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs hover:text-green-300 transition-colors whitespace-nowrap hidden sm:block">PayPal</a>
+        <a href="https://ko-fi.com/baggins83" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">Ko-fi</a>
+        <a href="https://www.paypal.com/paypalme/garyt83" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 bg-green-500 text-black text-xs font-semibold px-2 py-1 rounded-full transition-opacity whitespace-nowrap">PayPal</a>
       </div>
     </footer>
   )
