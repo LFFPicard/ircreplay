@@ -75,7 +75,9 @@ function Nav({ isMobile }) {
           size:    0,
         }),
       })
-      const { url, sessionId } = await res.json()
+      const text = await res.text()
+      console.log('API response:', text)
+      const { url, sessionId } = JSON.parse(text)
       if (!url) throw new Error('No upload URL')
 
       // Strip raw field same as local save
