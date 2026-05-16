@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { SessionProvider } from './context/SessionContext'
+import { UserProvider } from './context/UserContext'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import ClassicChrome from './components/ClassicChrome'
@@ -11,9 +12,9 @@ import About from './pages/About'
 import Help from './pages/Help'
 import Links from './pages/Links'
 import ComingSoon from './pages/ComingSoon'
-import { UserProvider } from './context/UserContext'
 import Pricing from './pages/Pricing'
 import Dashboard from './pages/Dashboard'
+import ShareView from './pages/ShareView'
 
 function AppRoutes() {
   return (
@@ -42,14 +43,11 @@ function useIsMobile() {
 
 function AppContent() {
   const { theme, setTheme } = useTheme()
-  const isMobile = useIsMobile()
+  const isMobile  = useIsMobile()
   const isClassic = theme === 'classic'
 
-  // Classic theme is desktop only — auto-switch to dark on mobile
   useEffect(() => {
-    if (isMobile && theme === 'classic') {
-      setTheme('dark')
-    }
+    if (isMobile && theme === 'classic') setTheme('dark')
   }, [isMobile, theme, setTheme])
 
   if (isClassic && !isMobile) {
@@ -79,7 +77,10 @@ function App() {
       <ThemeProvider>
         <SessionProvider>
           <UserProvider>
-            <AppContent />
+            <Routes>
+              <Route path="/s/:userId/:sessionId" element={<ShareView />} />
+              <Route path="*" element={<AppContent />} />
+            </Routes>
           </UserProvider>
         </SessionProvider>
       </ThemeProvider>

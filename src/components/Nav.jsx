@@ -94,7 +94,9 @@ const handleCloudSave = async () => {
       const data = JSON.parse(text)
 
       if (!data.saved) throw new Error(data.error || 'Save failed')
-      alert('Session saved to cloud! View it at /dashboard')
+      const shareUrl = `${window.location.origin}/s/${userId}/${data.sessionId}`
+      await navigator.clipboard.writeText(shareUrl)
+      alert(`Session saved! Share link copied to clipboard:\n${shareUrl}`)
     } catch (err) {
       console.error('Cloud save failed:', err)
       alert('Cloud save failed — please try again')

@@ -26,6 +26,7 @@ function Dashboard() {
   const [deleting, setDeleting] = useState(null)
   const [restoring, setRestoring] = useState(null)
   const navigate = useNavigate()
+  const [copied, setCopied] = useState(null)
 
   useEffect(() => {
     if (!userId) return
@@ -80,6 +81,13 @@ function Dashboard() {
     } finally {
       setDeleting(null)
     }
+  }
+
+  const handleCopyLink = (session) => {
+    const url = `${window.location.origin}/s/${userId}/${session.id}`
+    navigator.clipboard.writeText(url)
+    setCopied(session.id)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   if (!userId) {
@@ -152,6 +160,13 @@ function Dashboard() {
                     className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
                   >
                     {restoring === session.id ? '...' : '▶ Replay'}
+                  </button>
+                  <button
+                    onClick={() => handleCopyLink(session)}
+                    className="text-gray-500 hover:text-green-400 text-xs px-2 py-1.5 rounded transition-colors font-mono"
+                    title="Copy share link"
+                  >
+                    {copied === session.id ? '✓ Copied!' : '🔗'}
                   </button>
                   <button
                     onClick={() => handleDelete(session)}
