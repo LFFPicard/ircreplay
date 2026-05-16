@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 // IRCReplay — Paddle Webhook Handler
 //
-// TODO: Before going live, confirm these are set in Cloudflare Pages env vars:
+// Env vars required in Cloudflare Pages:
 //   PADDLE_WEBHOOK_SECRET  — from Paddle dashboard
 //                            Developer Tools → Notifications → your endpoint
 //   PADDLE_PRICE_LTD       — Price ID for the lifetime deal product
@@ -22,6 +22,7 @@ const HEADERS = {
 // ─────────────────────────────────────────────
 // SIGNATURE VERIFICATION
 // Paddle signs webhooks with HMAC-SHA256
+// Also checks timestamp to prevent replay attacks
 // ─────────────────────────────────────────────
 
 async function verifySignature(secret, body, signatureHeader) {
@@ -32,8 +33,14 @@ async function verifySignature(secret, body, signatureHeader) {
 
   if (!tsMatch || !h1Match) return false
 
-  const timestamp    = tsMatch[1]
-  const signature    = h1Match[1]
+  const timestamp = tsMatch[1]
+  const signature = h1Match[1]
+
+  // Reject webhooks older than 5 minutes — prevents replay attacks
+  const webhookTime = parseInt(timestamp, 10) * 1000
+  const fiveMinutes = 5 * 60 * 1000
+  if (Math.abs(Date.now() - webhookTime) > fiveMinutes) return false
+
   const signedPayload = `${timestamp}:${body}`
 
   const encoder = new TextEncoder()
@@ -90,33 +97,18 @@ async function setPremium(kv, userId, isPremium) {
 // ─────────────────────────────────────────────
 
 async function handleSubscriptionCreated(data, kv) {
-  console.log('handleSubscriptionCreated called')
-  console.log('data:', JSON.stringify(data))
-
-  const customData = data.custom_data || data.customData || {}
-  console.log('customData:', JSON.stringify(customData))
-
-  const userId = customData.clerk_user_id || customData.clerkUserId
-  console.log('userId:', userId)
-
-  if (!userId) {
-    console.error('no clerk_user_id found')
-    return
-  }
-
-  console.log('calling setPremium for', userId)
-  await setPremium(kv, userId, true)
-  console.log('setPremium complete')
-}
-
-async function handleSubscriptionUpdated(data, kv) {
   const customData = data.custom_data || data.customData || {}
   const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
-  const status        = data.status
+  await setPremium(kv, userId, true)
+}
+
+async function handleSubscriptionUpdated(data, kv) {
+  const customData     = data.custom_data || data.customData || {}
+  const userId         = customData.clerk_user_id || customData.clerkUserId
+  if (!userId) return
   const activeStatuses = ['active', 'trialing', 'past_due']
-  const isPremium     = activeStatuses.includes(status)
-  console.log(`subscription.updated: userId=${userId} status=${status}`)
+  const isPremium      = activeStatuses.includes(data.status)
   await setPremium(kv, userId, isPremium)
 }
 
@@ -124,24 +116,16 @@ async function handleSubscriptionCancelled(data, kv) {
   const customData = data.custom_data || data.customData || {}
   const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
-  console.log(`subscription.canceled: revoking premium from ${userId}`)
   await setPremium(kv, userId, false)
 }
 
 async function handleTransactionCompleted(data, kv, ltdPriceId) {
   const customData = data.custom_data || data.customData || {}
   const userId     = customData.clerk_user_id || customData.clerkUserId
-  if (!userId) {
-    console.error('transaction.completed: no clerk_user_id', JSON.stringify(customData))
-    return
-  }
+  if (!userId) return
   const items = data.items || []
   const isLTD = items.some(item => item.price?.id === ltdPriceId || item.price_id === ltdPriceId)
-  if (!isLTD) {
-    console.log('transaction.completed: not an LTD purchase — ignoring')
-    return
-  }
-  console.log(`transaction.completed: granting lifetime premium to ${userId}`)
+  if (!isLTD) return
   const user = await getUser(kv, userId) || { userId, createdAt: new Date().toISOString() }
   await setUser(kv, userId, {
     ...user,
@@ -162,11 +146,13 @@ export async function onRequestPost(context) {
   const signatureHeader = request.headers.get('paddle-signature')
   const body            = await request.text()
 
-   const isValid = await verifySignature(secret, body, signatureHeader)
-   if (!isValid) {
-     console.error('Paddle webhook signature verification failed')
-     return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: HEADERS })
-   }
+  const isValid = await verifySignature(secret, body, signatureHeader)
+  if (!isValid) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid signature' }),
+      { status: 401, headers: HEADERS }
+    )
+  }
 
   let payload
   try {
@@ -183,15 +169,12 @@ export async function onRequestPost(context) {
   const kv         = env.IRCREPLAY_KV
   const ltdPriceId = env.PADDLE_PRICE_LTD
 
-  console.log(`Paddle webhook received: ${eventType}`)
-
   try {
-    if      (eventType === 'subscription.created')   await handleSubscriptionCreated(data, kv)
-    else if (eventType === 'subscription.updated')   await handleSubscriptionUpdated(data, kv)
+    if      (eventType === 'subscription.created')                                             await handleSubscriptionCreated(data, kv)
+    else if (eventType === 'subscription.updated')                                             await handleSubscriptionUpdated(data, kv)
     else if (eventType === 'subscription.canceled' || eventType === 'subscription.cancelled')  await handleSubscriptionCancelled(data, kv)
-    else if (eventType === 'subscription.past_due')  await handleSubscriptionCancelled(data, kv)
-    else if (eventType === 'transaction.completed')  await handleTransactionCompleted(data, kv, ltdPriceId)
-    else console.log(`Unhandled event: ${eventType}`)
+    else if (eventType === 'subscription.past_due')                                            await handleSubscriptionCancelled(data, kv)
+    else if (eventType === 'transaction.completed')                                            await handleTransactionCompleted(data, kv, ltdPriceId)
 
     return new Response(
       JSON.stringify({ received: true }),
@@ -199,9 +182,8 @@ export async function onRequestPost(context) {
     )
 
   } catch (err) {
-    console.error(`Error handling ${eventType}:`, err.message)
     return new Response(
-      JSON.stringify({ error: 'Handler failed', detail: err.message }),
+      JSON.stringify({ error: 'Handler failed' }),
       { status: 500, headers: HEADERS }
     )
   }

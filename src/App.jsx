@@ -15,18 +15,33 @@ import ComingSoon from './pages/ComingSoon'
 import Pricing from './pages/Pricing'
 import Dashboard from './pages/Dashboard'
 import ShareView from './pages/ShareView'
+import { useAuth } from '@clerk/react'
+import { Navigate } from 'react-router-dom'
+import Terms   from './pages/Terms'
+import Privacy from './pages/Privacy'
+import Refunds from './pages/Refunds'
+
+function ProtectedRoute({ children }) {
+  const { userId, isLoaded } = useAuth()
+  if (!isLoaded) return null
+  if (!userId) return <Navigate to="/" replace />
+  return children
+}
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Viewer />} />
       <Route path="/stats" element={<Stats />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/about" element={<About />} />
       <Route path="/help" element={<Help />} />
       <Route path="/links" element={<Links />} />
       <Route path="/pro" element={<ComingSoon />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/refunds" element={<Refunds />} />
     </Routes>
   )
 }
