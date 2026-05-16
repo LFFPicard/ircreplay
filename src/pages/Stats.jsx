@@ -15,12 +15,13 @@ const LINE_COLORS = ['#22c55e','#a78bfa','#fb923c','#38bdf8','#f472b6']
 
 // ── PRO GATE ─────────────────────────────────────────────────────────
 
-function ProGate({ children }) {
+function ProGate({ children, title }) {
   return (
     <div className="relative">
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm rounded-lg gap-3">
         <span className="text-2xl">🔒</span>
         <p className="text-yellow-400 font-semibold font-mono text-sm">Pro Feature</p>
+        {title && <p className="text-gray-300 text-sm font-semibold">{title}</p>}
         <p className="text-gray-400 text-xs text-center px-4">Upgrade to IRCReplay Pro to unlock extended stats</p>
         <a href="/pricing" className="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold px-4 py-2 rounded-lg transition-colors">
           View Pricing
@@ -109,9 +110,9 @@ function TimeOfDay({ timeOfDay }) {
         {sections.map(s => (
           <div key={s.key}>
             <div className="text-gray-400 text-xs font-semibold">{s.label}</div>
-            <div className="text-gray-600 text-xs mb-2">Hours {s.sub}</div>
+            <div className="text-gray-400 text-xs mb-2">Hours {s.sub}</div>
             {timeOfDay[s.key].length === 0
-              ? <div className="text-gray-700 text-xs">No activity</div>
+              ? <div className="text-gray-400 text-xs">No activity</div>
               : timeOfDay[s.key].map((n, i) => (
                 <div key={n.nick} className="flex items-center justify-between text-xs mb-0.5">
                   <span className={`font-mono truncate ${i === 0 ? 'text-green-400' : 'text-gray-400'}`}>{n.nick}</span>
@@ -660,43 +661,43 @@ function Stats() {
         {/* Activity heatmap */}
         {isPremium
           ? <ActivityHeatmap heatmap={stats.heatmap} />
-          : <ProGate><ActivityHeatmap heatmap={stats.heatmap} /></ProGate>
+          : <ProGate title="Activity Heatmap"><ActivityHeatmap heatmap={stats.heatmap} /></ProGate>
         }
 
         {/* Nick activity over time */}
         {isPremium
           ? <NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} />
-          : <ProGate><NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} /></ProGate>
+          : <ProGate title="Top Chatters Over Time"><NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} /></ProGate>
         }
 
         {/* Word cloud + emoticons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {isPremium
-            ? <WordCloud topWords={stats.topWords} />
-            : <ProGate><WordCloud topWords={stats.topWords} /></ProGate>
-          }
-          {isPremium
-            ? <EmoticonStats topEmoticons={stats.topEmoticons} />
-            : <ProGate><EmoticonStats topEmoticons={stats.topEmoticons} /></ProGate>
-          }
+        {isPremium
+          ? <WordCloud topWords={stats.topWords} />
+          : <ProGate title="Word Cloud"><WordCloud topWords={stats.topWords} /></ProGate>
+        }
+        {isPremium
+          ? <EmoticonStats topEmoticons={stats.topEmoticons} />
+          : <ProGate title="Emoji &amp; Emoticon Stats"><EmoticonStats topEmoticons={stats.topEmoticons} /></ProGate>
+        }
         </div>
 
         {/* Connections + conversation starters */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {isPremium
-            ? <RelationshipMap topMentions={stats.topMentions} />
-            : <ProGate><RelationshipMap topMentions={stats.topMentions} /></ProGate>
-          }
-          {isPremium
-            ? <ConversationStarters topStarters={stats.topStarters} />
-            : <ProGate><ConversationStarters topStarters={stats.topStarters} /></ProGate>
-          }
+        {isPremium
+          ? <RelationshipMap topMentions={stats.topMentions} />
+          : <ProGate title="Connections Map"><RelationshipMap topMentions={stats.topMentions} /></ProGate>
+        }
+        {isPremium
+          ? <ConversationStarters topStarters={stats.topStarters} />
+          : <ProGate title="Conversation Starters"><ConversationStarters topStarters={stats.topStarters} /></ProGate>
+        }
         </div>
 
         {/* Channel mood */}
         {isPremium
           ? <ChannelMoodChart moodData={stats.moodData} />
-          : <ProGate><ChannelMoodChart moodData={stats.moodData} /></ProGate>
+          : <ProGate title="Channel Mood Over Time"><ChannelMoodChart moodData={stats.moodData} /></ProGate>
         }
 
       </div>
