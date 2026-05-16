@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@clerk/react'
 import { useSession } from '../context/SessionContext'
 import { loadSession } from '../lib/exportSession'
+import { useNavigate } from 'react-router-dom'
 
 function formatSize(bytes) {
   if (!bytes) return '—'
@@ -24,6 +25,7 @@ function Dashboard() {
   const [error,    setError   ] = useState(null)
   const [deleting, setDeleting] = useState(null)
   const [restoring, setRestoring] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!userId) return
@@ -62,7 +64,8 @@ function Dashboard() {
       setSession(restored)
 
       // Navigate to viewer
-      window.location.href = '/'
+      setSession(restored)
+      navigate('/')
     } catch (err) {
       console.error('Restore failed:', err)
       setError('Failed to restore session')
