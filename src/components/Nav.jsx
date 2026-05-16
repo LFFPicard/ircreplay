@@ -62,8 +62,11 @@ function Nav({ isMobile }) {
     saveSession(session)
   }
 
-const handleCloudSave = async () => {
-    if (!canSave || !userId) return
+const [cloudSaving, setCloudSaving] = useState(false)
+
+  const handleCloudSave = async () => {
+    if (!canSave || !userId || cloudSaving) return
+    setCloudSaving(true)
     try {
       const compactEvents = session.events.map(({ raw, ...rest }) => rest)
       const exportData = {
@@ -79,27 +82,24 @@ const handleCloudSave = async () => {
       }
       const json = JSON.stringify(exportData)
 
-      // POST the session JSON directly to the function
       const res  = await fetch('/api/logs', {
         method:  'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id':    userId,
-        },
-        body: json,
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': userId },
+        body:    json,
       })
 
       const text = await res.text()
-      console.log('Cloud save response:', text)
       const data = JSON.parse(text)
-
       if (!data.saved) throw new Error(data.error || 'Save failed')
+
       const shareUrl = `${window.location.origin}/s/${userId}/${data.sessionId}`
       await navigator.clipboard.writeText(shareUrl)
       alert(`Session saved! Share link copied to clipboard:\n${shareUrl}`)
     } catch (err) {
       console.error('Cloud save failed:', err)
       alert('Cloud save failed — please try again')
+    } finally {
+      setCloudSaving(false)
     }
   }
 
@@ -212,14 +212,16 @@ const handleCloudSave = async () => {
                 💾 Save Session
               </button>
             )}
-            {canSave && isPremium && userId && (
-              <button
-                onClick={() => { handleCloudSave(); setMenuOpen(false) }}
-                className="text-left px-6 py-3 text-blue-400 hover:bg-blue-500/10 transition-colors border-b border-gray-800 text-sm"
-              >
-                ☁️ Cloud Save
-              </button>
-            )}
+          {canSave && isPremium && userId && (
+          <button
+            onClick={handleCloudSave}
+            disabled={cloudSaving}
+            title="Save session to cloud — access from any device"
+            className="flex items-center gap-1.5 text-blue-400 hover:text-white border border-blue-600 hover:border-blue-400 disabled:opacity-50 disabled:cursor-wait text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          >
+            {cloudSaving ? '☁️ Saving...' : '☁️ Cloud Save'}
+          </button>
+        )}
             {canExport && (
               <div className="px-6 py-3 border-b border-gray-800 flex items-center gap-2">
                 <span className="text-gray-400 text-sm">Export:</span>

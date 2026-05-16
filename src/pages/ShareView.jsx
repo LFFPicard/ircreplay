@@ -176,39 +176,51 @@ function ShareView() {
   const workerRef = useRef(null)
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        setPhase('loading')
-        const res = await fetch(`/api/share/${userId}/${sessionId}`)
-        if (!res.ok) {
-          const data = await res.json()
-          throw new Error(data.error || `HTTP ${res.status}`)
-        }
-        const jsonText = await res.text()
-        const restored = loadSession(jsonText)
-        setSession(restored)
-        setPhase('computing')
+  const load = async () => {
+        try {
+          setPhase('loading')
+          const res = await fetch(`/api/share/${userId}/${sessionId}`)
 
-        const worker = new StatsWorker()
-        workerRef.current = worker
-        worker.onmessage = ({ data }) => {
-          if (data.type === 'done') {
-            setStats(data.stats)
-            setPhase('ready')
+          if (!res.ok) {
+            let errMsg = `HTTP ${res.status}`
+            try {
+              const errData = await res.json()
+              errMsg = errData.error || errMsg
+            } catch {}
+            throw new Error(errMsg)
+          }
+
+          // Read as text first for loadSession
+          const jsonText = await res.text()
+          if (!jsonText || jsonText.trim() === '') {
+            throw new Error('Empty response from server')
+          }
+
+          const restored = loadSession(jsonText)
+          setSession(restored)
+          setPhase('computing')
+
+          const worker = new StatsWorker()
+          workerRef.current = worker
+          worker.onmessage = ({ data }) => {
+            if (data.type === 'done') {
+              setStats(data.stats)
+              setPhase('ready')
+              worker.terminate()
+            }
+          }
+          worker.onerror = () => {
+            setPhase('error')
+            setErrorMsg('Failed to compute stats')
             worker.terminate()
           }
-        }
-        worker.onerror = () => {
+          worker.postMessage({ events: restored.events })
+        } catch (err) {
+          console.error('Share load error:', err)
           setPhase('error')
-          setErrorMsg('Failed to compute stats')
-          worker.terminate()
+          setErrorMsg(err.message || 'Failed to load session')
         }
-        worker.postMessage({ events: restored.events })
-      } catch (err) {
-        setPhase('error')
-        setErrorMsg(err.message || 'Failed to load session')
       }
-    }
     if (userId && sessionId) load()
     return () => workerRef.current?.terminate()
   }, [userId, sessionId])
