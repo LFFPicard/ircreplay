@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Legend } from 'recharts'
 import { useSession } from '../context/SessionContext'
+import { useUser } from '../context/UserContext'
 import StatsWorker from '../workers/statsWorker.js?worker'
 
 const HOUR_COLORS = [
@@ -9,6 +10,30 @@ const HOUR_COLORS = [
   '#10b981','#10b981','#10b981','#10b981','#10b981','#10b981',
   '#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6',
 ]
+
+const LINE_COLORS = ['#22c55e','#a78bfa','#fb923c','#38bdf8','#f472b6']
+
+// ── PRO GATE ─────────────────────────────────────────────────────────
+
+function ProGate({ children }) {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-950/80 backdrop-blur-sm rounded-lg gap-3">
+        <span className="text-2xl">🔒</span>
+        <p className="text-yellow-400 font-semibold font-mono text-sm">Pro Feature</p>
+        <p className="text-gray-400 text-xs text-center px-4">Upgrade to IRCReplay Pro to unlock extended stats</p>
+        <a href="/pricing" className="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+          View Pricing
+        </a>
+      </div>
+      <div className="opacity-20 pointer-events-none select-none">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+// ── FREE TIER COMPONENTS ──────────────────────────────────────────────
 
 function OverviewCard({ label, value }) {
   return (
@@ -27,7 +52,7 @@ function OverviewCards({ summary }) {
       <OverviewCard label="Words"     value={summary.totalWords.toLocaleString()} />
       <OverviewCard label="URLs"      value={summary.totalUrls.toLocaleString()} />
       <OverviewCard label="Joins"     value={summary.totalJoins.toLocaleString()} />
-      <OverviewCard label="Quits"     value={summary.totalQuits.toLocaleString()} />
+      <OverviewCard label="Days"      value={summary.totalDays.toLocaleString()} />
     </div>
   )
 }
@@ -55,10 +80,10 @@ function HourlyChart({ hourly }) {
       </ResponsiveContainer>
       <div className="flex gap-3 mt-2 justify-center flex-wrap">
         {[
-          { label: 'Night 0-6',      color: '#6366f1' },
-          { label: 'Morning 6-12',   color: '#f59e0b' },
-          { label: 'Afternoon 12-18',color: '#10b981' },
-          { label: 'Evening 18-24',  color: '#3b82f6' },
+          { label: 'Night 0-6',       color: '#6366f1' },
+          { label: 'Morning 6-12',    color: '#f59e0b' },
+          { label: 'Afternoon 12-18', color: '#10b981' },
+          { label: 'Evening 18-24',   color: '#3b82f6' },
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />
@@ -119,11 +144,8 @@ function SamplePanel({ label, samples }) {
 
 function NickProfile({ chatter, onClose }) {
   const [showSamples, setShowSamples] = useState(null)
-
   const toggleSamples = (key) => setShowSamples(showSamples === key ? null : key)
-
   const hourlyData = chatter.hourly.map((count, hour) => ({ hour: String(hour), count }))
-
   const clickableStats = [
     { key: 'questions', label: 'Question ratio', value: `${chatter.questionRatio}%`, samples: chatter.questionSamples || [] },
     { key: 'caps',      label: 'CAPS ratio',     value: `${chatter.capsRatio}%`,     samples: chatter.capsSamples     || [] },
@@ -132,13 +154,10 @@ function NickProfile({ chatter, onClose }) {
 
   return (
     <div className="bg-gray-900 border border-green-500/30 rounded-lg p-4 mt-1 w-full overflow-x-hidden">
-
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-green-400 font-mono font-bold text-lg">{chatter.nick}</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-white text-xs transition-colors">close ✕</button>
+        <button onClick={onClose} className="text-gray-500 hover:text-white text-xs transition-colors">close &#10005;</button>
       </div>
-
-      {/* Static stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
         {[
           { label: 'Lines',          value: chatter.lines.toLocaleString() },
@@ -152,101 +171,53 @@ function NickProfile({ chatter, onClose }) {
           </div>
         ))}
       </div>
-
-      {/* Clickable stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
-        {clickableStats.map(s => (
-          <div
-            key={s.key}
-            onClick={() => toggleSamples(s.key)}
-            className={`rounded p-2 cursor-pointer transition-colors border min-w-0 overflow-hidden ${
-              showSamples === s.key
-                ? 'bg-gray-700 border-green-500/50'
-                : 'bg-gray-800 border-transparent hover:border-green-500/30 hover:bg-gray-700'
-            }`}
-          >
-            <div className="text-white font-mono text-sm font-bold">{s.value}</div>
-            <div className="text-gray-500 text-xs truncate">{s.label}</div>
-            <div className="text-green-600 text-xs mt-0.5">
-              {showSamples === s.key ? 'hide examples' : 'click for examples'}
+        {clickableStats.map(s => {
+          const isActive = showSamples === s.key
+          const cardClass = isActive
+            ? 'bg-gray-700 border-green-500/50'
+            : 'bg-gray-800 border-transparent hover:border-green-500/30 hover:bg-gray-700'
+          return (
+            <div key={s.key} onClick={() => toggleSamples(s.key)} className={`rounded p-2 cursor-pointer transition-colors border min-w-0 overflow-hidden ${cardClass}`}>
+              <div className="text-white font-mono text-sm font-bold">{s.value}</div>
+              <div className="text-gray-500 text-xs truncate">{s.label}</div>
+              <div className="text-green-600 text-xs mt-0.5">{isActive ? 'hide examples' : 'click for examples'}</div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-
-      {/* Sample panel */}
       {showSamples && (
         <SamplePanel
           label={clickableStats.find(s => s.key === showSamples)?.label}
           samples={clickableStats.find(s => s.key === showSamples)?.samples}
         />
       )}
-
-      {/* Aliases */}
       {chatter.aliases.length > 0 && (
         <div className="mb-3">
-          <span className="text-gray-500 text-xs">Possible aliases (same session nick changes): </span>
-          {chatter.aliases.map(a => (
-            <span key={a} className="text-gray-400 font-mono text-xs bg-gray-800 px-2 py-0.5 rounded mr-1">{a}</span>
-          ))}
-        </div>
-      )}
-
-      {/* Hourly chart */}
-      <div className="mb-3">
-        <div className="text-gray-500 text-xs mb-1">Hourly activity</div>
-        <ResponsiveContainer width="100%" height={60}>
-          <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
-            <XAxis dataKey="hour" tick={{ fill: '#4b5563', fontSize: 8 }} interval={5} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '4px' }}
-              labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-              itemStyle={{ color: '#10b981', fontSize: '10px' }}
-              formatter={(v) => [v, 'msgs']}
-            />
-            <Bar dataKey="count" fill="#059669" radius={[1, 1, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* First / last seen */}
-      {chatter.firstSeen && (
-        <div className="text-gray-600 text-xs mb-3">
-          First seen: <span className="text-gray-400">{chatter.firstSeen}</span>
-          {' · '}
-          Last seen: <span className="text-gray-400">{chatter.lastSeen}</span>
-        </div>
-      )}
-
-      {/* Sample quote */}
-      {chatter.sampleQuote && (
-        <div className="text-gray-500 text-xs italic mb-3">&ldquo;{chatter.sampleQuote}&rdquo;</div>
-      )}
-
-      {/* Recent activity */}
-      {chatter.recentActivity.length > 0 && (
-        <div>
-          <div className="text-gray-500 text-xs mb-1">Recent messages</div>
-          <div className="bg-gray-800 rounded p-2 space-y-0.5 max-h-32 overflow-y-auto">
-            {chatter.recentActivity.map((a, i) => (
-              <div key={i} className="font-mono text-xs flex gap-2">
-                <span className="text-gray-600 shrink-0">[{a.timestamp}]</span>
-                <span className={a.type === 'action' ? 'text-purple-400 italic' : 'text-gray-300'}>
-                  {a.type === 'action' ? `* ${chatter.nick} ${a.text}` : a.text}
-                </span>
-              </div>
+          <div className="text-gray-500 text-xs mb-1">Known aliases:</div>
+          <div className="flex flex-wrap gap-1">
+            {chatter.aliases.map(a => (
+              <span key={a} className="text-gray-400 font-mono text-xs bg-gray-800 px-2 py-0.5 rounded">{a}</span>
             ))}
           </div>
         </div>
       )}
-
+      <div>
+        <div className="text-gray-500 text-xs mb-1">Hourly activity:</div>
+        <ResponsiveContainer width="100%" height={60}>
+          <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
+            <XAxis dataKey="hour" tick={{ fill: '#4b5563', fontSize: 8 }} interval={5} />
+            <Bar dataKey="count" fill="#22c55e" radius={[1, 1, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }
 
 function TopChatters({ topChatters }) {
+  const [showAll,  setShowAll ] = useState(false)
   const [selected, setSelected] = useState(null)
-  const [showAll,  setShowAll  ] = useState(false)
   const displayed = showAll ? topChatters : topChatters.slice(0, 20)
 
   return (
@@ -260,50 +231,48 @@ function TopChatters({ topChatters }) {
               <th className="text-left pb-2">Nick</th>
               <th className="text-right pb-2">Lines</th>
               <th className="text-right pb-2 hidden md:table-cell">Words</th>
-              <th className="text-right pb-2 hidden md:table-cell">Avg words</th>
+              <th className="text-right pb-2 hidden md:table-cell">Avg</th>
               <th className="text-left pb-2 hidden lg:table-cell pl-4">Sample Quote</th>
             </tr>
           </thead>
           <tbody>
-            {displayed.map((chatter) => (
-              <Fragment key={chatter.nick}>
-                <tr
-                  onClick={() => setSelected(selected === chatter.nick ? null : chatter.nick)}
-                  className={`border-b border-gray-700/50 cursor-pointer transition-colors ${
-                    selected === chatter.nick ? 'bg-green-900/20' : 'hover:bg-gray-700/50'
-                  }`}
-                >
-                  <td className="py-1.5 text-gray-600 font-mono text-xs">{chatter.rank}</td>
-                  <td className="py-1.5 font-mono text-green-400 font-semibold">
-                    {chatter.nick}
-                    {chatter.aliases.length > 0 && (
-                      <span className="text-gray-600 text-xs ml-1">+{chatter.aliases.length} alias</span>
-                    )}
-                  </td>
-                  <td className="py-1.5 text-right text-gray-300 font-mono">{chatter.lines.toLocaleString()}</td>
-                  <td className="py-1.5 text-right text-gray-500 font-mono hidden md:table-cell">{chatter.words.toLocaleString()}</td>
-                  <td className="py-1.5 text-right text-gray-500 font-mono hidden md:table-cell">{chatter.avgWords}</td>
-                  <td className="py-1.5 text-gray-600 text-xs pl-4 hidden lg:table-cell truncate max-w-xs italic">
-                    {chatter.sampleQuote ? `"${chatter.sampleQuote}"` : ''}
-                  </td>
-                </tr>
-                {selected === chatter.nick && (
-                  <tr>
-                      <td colSpan={6} className="pb-3 overflow-hidden" style={{ maxWidth: '1px', width: '100%' }}>  
-                      <NickProfile chatter={chatter} onClose={() => setSelected(null)} />
+            {displayed.map((chatter) => {
+              const isSelected = selected === chatter.nick
+              const rowClass = isSelected
+                ? 'border-b border-gray-700/50 cursor-pointer transition-colors bg-green-900/20'
+                : 'border-b border-gray-700/50 cursor-pointer transition-colors hover:bg-gray-700/50'
+              return (
+                <Fragment key={chatter.nick}>
+                  <tr onClick={() => setSelected(isSelected ? null : chatter.nick)} className={rowClass}>
+                    <td className="py-1.5 text-gray-600 font-mono text-xs">{chatter.rank}</td>
+                    <td className="py-1.5 font-mono text-green-400 font-semibold">
+                      {chatter.nick}
+                      {chatter.aliases.length > 0 && (
+                        <span className="text-gray-600 text-xs ml-1">+{chatter.aliases.length} alias</span>
+                      )}
+                    </td>
+                    <td className="py-1.5 text-right text-gray-300 font-mono">{chatter.lines.toLocaleString()}</td>
+                    <td className="py-1.5 text-right text-gray-500 font-mono hidden md:table-cell">{chatter.words.toLocaleString()}</td>
+                    <td className="py-1.5 text-right text-gray-500 font-mono hidden md:table-cell">{chatter.avgWords}</td>
+                    <td className="py-1.5 text-gray-600 text-xs pl-4 hidden lg:table-cell truncate max-w-xs italic">
+                      {chatter.sampleQuote ? `"${chatter.sampleQuote}"` : ''}
                     </td>
                   </tr>
-                )}
-              </Fragment>
-            ))}
+                  {isSelected && (
+                    <tr>
+                      <td colSpan={6} className="pb-3 overflow-hidden" style={{ maxWidth: '1px', width: '100%' }}>
+                        <NickProfile chatter={chatter} onClose={() => setSelected(null)} />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              )
+            })}
           </tbody>
         </table>
       </div>
       {topChatters.length > 20 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="mt-3 text-xs text-gray-500 hover:text-green-400 transition-colors"
-        >
+        <button onClick={() => setShowAll(!showAll)} className="mt-3 text-xs text-gray-500 hover:text-green-400 transition-colors">
           {showAll ? 'Show top 20 only' : `Show all ${topChatters.length} chatters`}
         </button>
       )}
@@ -314,7 +283,7 @@ function TopChatters({ topChatters }) {
 function WordStats({ topWords }) {
   const [showAll, setShowAll] = useState(false)
   const maxCount  = topWords[0]?.count || 1
-  const displayed = showAll ? topWords : topWords.slice(0, 20)
+  const displayed = showAll ? topWords.slice(0, 50) : topWords.slice(0, 20)
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <h3 className="text-gray-300 font-semibold mb-3">Most Used Words</h3>
@@ -330,10 +299,7 @@ function WordStats({ topWords }) {
         ))}
       </div>
       {topWords.length > 20 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="mt-3 text-xs text-gray-500 hover:text-green-400 transition-colors"
-        >
+        <button onClick={() => setShowAll(!showAll)} className="mt-3 text-xs text-gray-500 hover:text-green-400 transition-colors">
           {showAll ? 'Show top 20' : `Show all ${topWords.length} words`}
         </button>
       )}
@@ -344,9 +310,9 @@ function WordStats({ topWords }) {
 function UrlList({ urls }) {
   const [showAll, setShowAll] = useState(false)
   if (urls.length === 0) return null
-  const displayed = showAll ? urls : urls.slice(0, 10)
-  const hasMore = urls.length > 10
-  const showMoreLabel = `Show all ${urls.length} URLs`
+  const displayed  = showAll ? urls : urls.slice(0, 10)
+  const hasMore    = urls.length > 10
+  const moreLabel  = `Show all ${urls.length} URLs`
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <h3 className="text-gray-300 font-semibold mb-3">URLs Shared ({urls.length.toLocaleString()})</h3>
@@ -360,15 +326,245 @@ function UrlList({ urls }) {
       </div>
       {hasMore && (
         <button onClick={() => setShowAll(!showAll)} className="mt-3 text-xs text-gray-500 hover:text-green-400 transition-colors">
-          {showAll ? 'Show fewer' : showMoreLabel}
+          {showAll ? 'Show fewer' : moreLabel}
         </button>
       )}
     </div>
   )
 }
 
+// ── PRO TIER COMPONENTS ───────────────────────────────────────────────
+
+function ActivityHeatmap({ heatmap }) {
+  if (!heatmap || heatmap.length === 0) return null
+  const allCounts = heatmap.flatMap(d => d.hours)
+  const maxCount  = Math.max(...allCounts, 1)
+
+  const getColor = (count) => {
+    if (count === 0) return '#111827'
+    const intensity = count / maxCount
+    if (intensity < 0.25) return '#14532d'
+    if (intensity < 0.5)  return '#166534'
+    if (intensity < 0.75) return '#15803d'
+    return '#22c55e'
+  }
+
+  const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+  const showDays = heatmap.slice(-30)
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Activity Heatmap</h3>
+      <p className="text-gray-500 text-xs mb-3">Message activity by hour across each day (darker = more active)</p>
+      <div className="overflow-x-auto">
+        <div className="min-w-max">
+          <div className="flex gap-1 mb-1 ml-8">
+            {hours.map(h => (
+              <div key={h} className="w-4 text-center text-gray-600" style={{ fontSize: '8px' }}>{h}</div>
+            ))}
+          </div>
+          <div className="space-y-0.5">
+            {showDays.map((day) => (
+              <div key={day.day} className="flex items-center gap-1">
+                <div className="w-7 text-gray-600 text-right shrink-0" style={{ fontSize: '8px' }}>D{day.day}</div>
+                {day.hours.map((count, h) => (
+                  <div
+                    key={h}
+                    className="w-4 h-4 rounded-sm"
+                    style={{ backgroundColor: getColor(count) }}
+                    title={`Day ${day.day} ${h}:00 — ${count} messages`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 mt-3">
+            <span className="text-gray-600 text-xs">Less</span>
+            {['#111827','#14532d','#166534','#15803d','#22c55e'].map(c => (
+              <div key={c} className="w-3 h-3 rounded-sm" style={{ backgroundColor: c }} />
+            ))}
+            <span className="text-gray-600 text-xs">More</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function NickActivityChart({ nickActivityData, top5nicks }) {
+  if (!nickActivityData || nickActivityData.length === 0) return null
+  const showData = nickActivityData.length > 60
+    ? nickActivityData.filter((_, i) => i % Math.ceil(nickActivityData.length / 60) === 0)
+    : nickActivityData
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Top Chatters Over Time</h3>
+      <p className="text-gray-500 text-xs mb-3">Daily message counts for the top 5 most active users</p>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={showData} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
+          <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 10 }} label={{ value: 'Day', position: 'insideBottom', fill: '#6b7280', fontSize: 10 }} />
+          <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
+          <Tooltip
+            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '6px' }}
+            labelStyle={{ color: '#9ca3af' }}
+            labelFormatter={(d) => `Day ${d}`}
+          />
+          <Legend wrapperStyle={{ fontSize: '11px', color: '#9ca3af' }} />
+          {top5nicks.map((nick, i) => (
+            <Line key={nick} type="monotone" dataKey={nick} stroke={LINE_COLORS[i]} dot={false} strokeWidth={1.5} />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+function WordCloud({ topWords }) {
+  if (!topWords || topWords.length === 0) return null
+  const maxCount  = topWords[0]?.count || 1
+  const cloudWords = topWords.slice(0, 60)
+
+  const getSize = (count) => {
+    const ratio = count / maxCount
+    if (ratio > 0.8) return 'text-3xl font-black'
+    if (ratio > 0.6) return 'text-2xl font-bold'
+    if (ratio > 0.4) return 'text-xl font-bold'
+    if (ratio > 0.2) return 'text-lg font-semibold'
+    if (ratio > 0.1) return 'text-base font-medium'
+    return 'text-sm'
+  }
+
+  const getColorClass = (count) => {
+    const ratio = count / maxCount
+    if (ratio > 0.6) return 'text-green-400'
+    if (ratio > 0.3) return 'text-green-500'
+    if (ratio > 0.1) return 'text-green-600'
+    return 'text-gray-500'
+  }
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Word Cloud</h3>
+      <p className="text-gray-500 text-xs mb-3">Top 60 words — size reflects frequency</p>
+      <div className="flex flex-wrap gap-2 items-center justify-center min-h-32">
+        {cloudWords.map(({ word, count }) => {
+          const sizeClass  = getSize(count)
+          const colorClass = getColorClass(count)
+          return (
+            <span key={word} className={`${sizeClass} ${colorClass} font-mono cursor-default`} title={`${word}: ${count.toLocaleString()} times`}>
+              {word}
+            </span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function EmoticonStats({ topEmoticons }) {
+  if (!topEmoticons || topEmoticons.length === 0) return null
+  const maxCount = topEmoticons[0]?.count || 1
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Emoji &amp; Emoticon Stats</h3>
+      <p className="text-gray-500 text-xs mb-3">Most used emoticons and laugh words</p>
+      <div className="space-y-1.5">
+        {topEmoticons.map(({ emoticon, count }) => (
+          <div key={emoticon} className="flex items-center gap-2">
+            <span className="text-yellow-400 font-mono text-sm w-16 shrink-0">{emoticon}</span>
+            <div className="flex-1 bg-gray-700 rounded-full h-1.5">
+              <div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} />
+            </div>
+            <span className="text-gray-600 font-mono text-xs w-14 text-right">{count.toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RelationshipMap({ topMentions }) {
+  if (!topMentions || topMentions.length === 0) return null
+  const maxCount = topMentions[0]?.count || 1
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Connections</h3>
+      <p className="text-gray-500 text-xs mb-3">Who mentions who most often — top nick-to-nick connections</p>
+      <div className="space-y-1.5">
+        {topMentions.map(({ from, to, count }, i) => (
+          <div key={i} className="flex items-center gap-2 text-xs">
+            <span className="text-green-400 font-mono w-24 shrink-0 truncate">{from}</span>
+            <span className="text-gray-600">&#8594;</span>
+            <span className="text-blue-400 font-mono w-24 shrink-0 truncate">{to}</span>
+            <div className="flex-1 bg-gray-700 rounded-full h-1">
+              <div className="bg-blue-500 h-1 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} />
+            </div>
+            <span className="text-gray-600 font-mono w-10 text-right">{count}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ConversationStarters({ topStarters }) {
+  if (!topStarters || topStarters.length === 0) return null
+  const maxCount = topStarters[0]?.count || 1
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Conversation Starters</h3>
+      <p className="text-gray-500 text-xs mb-3">Who breaks the silence most — first to post after 5+ minutes quiet</p>
+      <div className="space-y-1.5">
+        {topStarters.map(({ nick, count }) => (
+          <div key={nick} className="flex items-center gap-2">
+            <span className="text-gray-400 font-mono text-sm w-28 shrink-0 truncate">{nick}</span>
+            <div className="flex-1 bg-gray-700 rounded-full h-1.5">
+              <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} />
+            </div>
+            <span className="text-gray-600 font-mono text-xs w-14 text-right">{count} times</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ChannelMoodChart({ moodData }) {
+  if (!moodData || moodData.length === 0) return null
+  const showData = moodData.length > 60
+    ? moodData.filter((_, i) => i % Math.ceil(moodData.length / 60) === 0)
+    : moodData
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <h3 className="text-gray-300 font-semibold mb-1">Channel Mood Over Time</h3>
+      <p className="text-gray-500 text-xs mb-3">Daily % of messages containing laughter, questions, and CAPS</p>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={showData} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
+          <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 10 }} />
+          <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} unit="%" />
+          <Tooltip
+            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '6px' }}
+            labelStyle={{ color: '#9ca3af' }}
+            labelFormatter={(d) => `Day ${d}`}
+            formatter={(v, name) => [`${v}%`, name]}
+          />
+          <Legend wrapperStyle={{ fontSize: '11px', color: '#9ca3af' }} />
+          <Line type="monotone" dataKey="laughter"  stroke="#22c55e" dot={false} strokeWidth={1.5} name="Laughter" />
+          <Line type="monotone" dataKey="questions" stroke="#38bdf8" dot={false} strokeWidth={1.5} name="Questions" />
+          <Line type="monotone" dataKey="caps"      stroke="#f87171" dot={false} strokeWidth={1.5} name="CAPS" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+// ── MAIN STATS PAGE ───────────────────────────────────────────────────
+
 function Stats() {
   const { session, setStats: setStatsCtx } = useSession()
+  const { isPremium } = useUser()
   const [stats,   setStats  ] = useState(null)
   const [loading, setLoading] = useState(false)
   const workerRef = useRef(null)
@@ -418,20 +614,31 @@ function Stats() {
   if (!stats) return null
 
   const isMultiFile = session.fileCount > 1
-  const dateRange = session.dateEnd ? `${session.date} to ${session.dateEnd}` : session.date
+  const dateRange   = session.dateEnd ? `${session.date} to ${session.dateEnd}` : session.date
 
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-6xl mx-auto space-y-4 pb-6">
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-green-400">{session.channel} &mdash; Stats</h2>
             <p className="text-gray-400 text-sm">{dateRange}</p>
           </div>
-          {isMultiFile && (
-            <span className="text-xs bg-green-900/50 text-green-400 px-2 py-0.5 rounded-full">{session.fileCount} files</span>
-          )}
+          <div className="flex items-center gap-2">
+            {isPremium && (
+              <span className="text-xs bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full font-mono">
+                &#9889; Pro
+              </span>
+            )}
+            {isMultiFile && (
+              <span className="text-xs bg-green-900/50 text-green-400 px-2 py-0.5 rounded-full">{session.fileCount} files</span>
+            )}
+          </div>
         </div>
+
+        {/* Free stats */}
         <OverviewCards summary={stats.summary} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <HourlyChart hourly={stats.hourly} />
@@ -442,6 +649,56 @@ function Stats() {
           <WordStats topWords={stats.topWords} />
           <UrlList urls={stats.urls} />
         </div>
+
+        {/* Pro stats divider */}
+        <div className="flex items-center gap-3 pt-2">
+          <div className="h-px flex-1 bg-gray-700" />
+          <span className="text-yellow-500/70 font-mono text-xs">&#9889; Pro Stats</span>
+          <div className="h-px flex-1 bg-gray-700" />
+        </div>
+
+        {/* Activity heatmap */}
+        {isPremium
+          ? <ActivityHeatmap heatmap={stats.heatmap} />
+          : <ProGate><ActivityHeatmap heatmap={stats.heatmap} /></ProGate>
+        }
+
+        {/* Nick activity over time */}
+        {isPremium
+          ? <NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} />
+          : <ProGate><NickActivityChart nickActivityData={stats.nickActivityData} top5nicks={stats.top5nicks} /></ProGate>
+        }
+
+        {/* Word cloud + emoticons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {isPremium
+            ? <WordCloud topWords={stats.topWords} />
+            : <ProGate><WordCloud topWords={stats.topWords} /></ProGate>
+          }
+          {isPremium
+            ? <EmoticonStats topEmoticons={stats.topEmoticons} />
+            : <ProGate><EmoticonStats topEmoticons={stats.topEmoticons} /></ProGate>
+          }
+        </div>
+
+        {/* Connections + conversation starters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {isPremium
+            ? <RelationshipMap topMentions={stats.topMentions} />
+            : <ProGate><RelationshipMap topMentions={stats.topMentions} /></ProGate>
+          }
+          {isPremium
+            ? <ConversationStarters topStarters={stats.topStarters} />
+            : <ProGate><ConversationStarters topStarters={stats.topStarters} /></ProGate>
+          }
+        </div>
+
+        {/* Channel mood */}
+        {isPremium
+          ? <ChannelMoodChart moodData={stats.moodData} />
+          : <ProGate><ChannelMoodChart moodData={stats.moodData} /></ProGate>
+        }
+
       </div>
     </div>
   )

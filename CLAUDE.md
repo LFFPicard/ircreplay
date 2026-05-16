@@ -3,7 +3,7 @@
 ## Project Overview
 Browser-based IRC log viewer and statistics generator. Users drag-and-drop IRC log files, view them in a themed chat interface, and explore channel statistics. Fully client-side for the free tier — no server, no database.
 
-A premium tier is in active build. Auth, KV storage, and billing pipeline are all live in sandbox. Next step is R2 storage for cloud log saving.
+A premium tier is in active build. Auth, KV storage, billing pipeline, and R2 cloud storage are all working in sandbox. Next step is branded share links and extended stats.
 
 ## Stack
 
@@ -17,14 +17,14 @@ A premium tier is in active build. Auth, KV storage, and billing pipeline are al
 - **Hosting:** Cloudflare Pages (auto-deploys from GitHub push to `main`)
 - **Functions:** Cloudflare Pages Functions (`/functions` folder at project root)
 - **KV:** Cloudflare KV — namespace `IRCREPLAY_KV`, bound in CF Pages settings
+- **R2:** Cloudflare R2 — bucket `ircreplay-logs`, bound as `IRCREPLAY_R2`
 - **Billing:** Paddle (sandbox) — overlay checkout via Paddle.js, webhook handler live
 - **Email:** Resend — waitlist signups via `/api/waitlist` function
 - **Repo:** github.com/LFFPicard/ircreplay (public)
 - **Domain:** ircreplay.app
 
 ### Planned additions (premium tier)
-- **File storage:** Cloudflare R2 — zero egress fees, native to CF Pages. Log files uploaded via presigned URLs.
-- **Transactional email:** Resend — subscription confirmations and welcome emails.
+- **Transactional email:** Resend — subscription confirmations and welcome emails
 
 ## Environment Variables (Cloudflare Pages + .env.local)
 
@@ -53,15 +53,17 @@ A premium tier is in active build. Auth, KV storage, and billing pipeline are al
 ### Premium tier (in build)
 - CF Pages Functions provide thin API at `/functions/api/`
 - KV stores user records keyed by Clerk user ID: `user:{userId}`
+- KV stores session lists: `sessions:{userId}` → array of session metadata
 - User record shape: `{ userId, createdAt, isPremium, premiumSince, isLifetime? }`
+- Session metadata shape: `{ id, channel, date, savedAt, size }`
+- R2 stores session JSON files at key: `{userId}/{sessionId}.json`
 - Paddle webhook flips `isPremium` flag in KV on subscription events
-- All premium features will gate on `isPremium` from KV
-- R2 bucket scoped per user ID (not yet built)
+- All premium features gate on `isPremium` from KV via UserContext
 
 ## Key Directories
 ```
 src/
-├── pages/          # Viewer, Stats, About, Help, Links, ComingSoon, Pricing
+├── pages/          # Viewer, Stats, About, Help, Links, ComingSoon, Pricing, Dashboard
 ├── components/     # Nav, ChatPane, NamesPanel, ChatLine, DropZone, Footer,
 │                   # PlaybackControls, ClassicChrome
 ├── workers/        # parseWorker.js, statsWorker.js
@@ -73,6 +75,7 @@ functions/
 └── api/
     ├── waitlist.js         # Resend email capture — LIVE
     ├── user.js             # KV user record create/fetch — LIVE
+    ├── logs.js             # R2 cloud storage CRUD — LIVE
     └── webhook/
         └── paddle.js       # Paddle webhook handler — LIVE (sandbox)
 ```
@@ -96,6 +99,7 @@ functions/
 - Paddle initialised in `useEffect` in `Pricing.jsx` — called ONCE on page load, not on button click
 - `Environment.set('sandbox')` must be called BEFORE `Initialize()`
 - Checkout passes `clerk_user_id` via `customData`
+- Sign in guard in place — `openSignIn()` called if not signed in when clicking checkout
 
 ### Paddle camelCase gotcha
 Paddle converts `custom_data` keys to camelCase in webhook payloads:
@@ -121,6 +125,27 @@ It starts with `pdl_ntfset_` and is much longer — includes a random signing ke
 4. Swap `PADDLE_API_KEY` and `PADDLE_WEBHOOK_SECRET` for live values
 5. Create new live webhook endpoint in Paddle pointing to same URL
 6. Switch Clerk from dev to production keys
+7. Uncomment Sign Up buttons in Nav.jsx
+8. Remove debug console.logs from paddle.js webhook handler
+
+## R2 Cloud Storage — IMPORTANT
+
+### How it works
+- Session JSON is POSTed directly to `/api/logs` — function writes to R2
+- Function reads JSON back from R2 and returns it directly on GET
+- No presigned URLs — direct read/write through the function
+- Session limit: 50 for Pro, unlimited for Lifetime (`isLifetime: true` in KV)
+
+### R2 binding
+- Variable name in function: `env.IRCREPLAY_R2`
+- Bound in Cloudflare Pages → Settings → Bindings
+- Any change to bindings requires a new deployment to take effect
+
+### Dashboard
+- `/dashboard` route — shows saved sessions list
+- ⚡ Instant and ▶ Replay buttons per session — mode passed via `session.mode`
+- Viewer picks up `session.mode` via `useEffect` on session change
+- Delete removes from both R2 and KV session list
 
 ## Web Workers
 - Workers live in `src/workers/`, import from `../lib/` (relative path)
@@ -194,6 +219,9 @@ Opens at `http://localhost:8788`. Requires `wrangler.toml` at project root with 
 ### wrangler.toml
 Required for local KV testing. Local dev uses simulated KV — does NOT write to real Cloudflare KV. Use `--remote` flag for real KV testing locally.
 
+### Cloudflare Bindings
+Any change to KV or R2 bindings in Cloudflare dashboard requires a new deployment before the function can use the updated binding. Push an empty commit to trigger a rebuild if needed.
+
 ### .gitignore — must include
 ```
 *.local
@@ -220,7 +248,7 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 - Three themes — Dark, Light, Classic mIRC chrome
 - Mobile responsive — hamburger nav, Classic desktop-only
 - Export — HTML stats page, PDF via print dialog
-- Session JSON save/load
+- Session JSON save/load (local)
 - Demo log (one-click load on drop zone)
 - About, Help/FAQ, Links, Pricing, Pro Coming Soon pages
 - Footer with Ko-fi and PayPal donation links
@@ -228,14 +256,14 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 ### SEO & Marketing — Complete ✅
 - Meta tags, OG tags, Twitter card (summary_large_image)
 - OG social preview image (1200×630px)
-- LemonSqueezy store assets (logo 160x160, favicon 32x32, header 1600x300)
+- Paddle store assets (logo 160x160, favicon 32x32, header 1600x300)
 - robots.txt and sitemap.xml
 - Google Search Console submitted
 - Reddit posts — r/IRC and r/mIRC
 - Scriptserv.com (sorzkode) linking to IRCReplay
 - 875+ unique visitors in first week
 
-### Premium Infrastructure — Billing Complete ✅
+### Premium Infrastructure — Phase 1 Complete ✅
 - ✅ Clerk auth — sign in live, sign ups restricted, Google SSO working
 - ✅ Cloudflare KV — user records created on sign in
 - ✅ /api/waitlist CF Function — Resend email capture live
@@ -246,31 +274,37 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 - ✅ subscription.created → isPremium: true confirmed
 - ✅ subscription.cancelled → isPremium: false confirmed
 - ✅ Sign in guard on checkout — prompts Clerk modal if not signed in
-- ⏳ R2 file storage — next up
-- ⏳ Switch to live Paddle + Clerk credentials — after Pro features built
+- ✅ R2 bucket created and bound as IRCREPLAY_R2
+- ✅ /api/logs CF Function — cloud save, list, restore, delete all working
+- ✅ Dashboard page — session list with Instant/Replay restore and delete
+- ✅ Cloud Save button in nav — premium + signed in only
+- ✅ Session limit enforced — 50 for Pro, unlimited for Lifetime
+- ⏳ Switch to live Paddle + Clerk credentials — after Phase 2 built
 
 ## Next Steps (in order)
 
-### Phase 1 — R2 Storage
-- Create R2 bucket in Cloudflare dashboard
-- Build `functions/api/logs.js` — presigned URL generation, log CRUD
-- Add saved logs dashboard page (list, load, delete)
-- Gate on `isPremium` check from KV
-
 ### Phase 2 — Premium Features
-- Cloud log storage UI wired to R2
-- Branded share links `/s/:nick/:channel`
-- Extended stats visualisations
-- Enforce free tier limits with upgrade prompts
+- **Branded share links** — `/s/:channel/:id` public read-only stats page
+  - Generate share URL when saving to cloud
+  - Public route — no auth required to view
+  - Shows stats page with channel name and branding
+- **Extended stats visualisations** — additional Recharts charts for Pro users
+  - Activity heatmap (day of week x hour of day)
+  - Nick activity over time (line chart)
+  - Word cloud (consider d3-cloud)
+- **Free tier limits** — soft limits with upgrade prompts
+  - Stats page shows upgrade prompt for extended charts
+  - Dashboard shows upgrade prompt when not premium
 
 ### Phase 3 — Launch
-- Remove debug console.logs from webhook handler
-- Switch Paddle sandbox → live credentials
-- Switch Clerk dev → production keys
+- Remove debug console.logs from paddle.js webhook handler
+- Switch Paddle sandbox to live credentials
+- Switch Clerk dev to production keys
 - Uncomment Sign Up buttons in Nav.jsx
+- Update Help page — add cloud storage and dashboard to feature list
 - Resend subscription confirmation emails
-- Announce to IRC communities
-- Run LTD campaign
+- Announce to IRC communities (Reddit r/IRC, r/mIRC, Scriptserv)
+- Run LTD campaign — first 100 customers £49.99 lifetime
 
 ## Commands
 ```bash
