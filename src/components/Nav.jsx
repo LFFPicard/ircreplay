@@ -62,25 +62,9 @@ function Nav({ isMobile }) {
     saveSession(session)
   }
 
-  const handleCloudSave = async () => {
+const handleCloudSave = async () => {
     if (!canSave || !userId) return
     try {
-      // Request presigned upload URL from function
-      const res = await fetch('/api/logs', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': userId },
-        body: JSON.stringify({
-          channel: session.channel,
-          date:    session.date,
-          size:    0,
-        }),
-      })
-      const text = await res.text()
-      console.log('API response:', text)
-      const { url, sessionId } = JSON.parse(text)
-      if (!url) throw new Error('No upload URL')
-
-      // Strip raw field same as local save
       const compactEvents = session.events.map(({ raw, ...rest }) => rest)
       const exportData = {
         version:   1,
@@ -95,14 +79,22 @@ function Nav({ isMobile }) {
       }
       const json = JSON.stringify(exportData)
 
-      // Upload directly to R2 via presigned URL
-      await fetch(url, {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    json,
+      // POST the session JSON directly to the function
+      const res  = await fetch('/api/logs', {
+        method:  'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id':    userId,
+        },
+        body: json,
       })
 
-      alert(`Session saved to cloud! View it at /dashboard`)
+      const text = await res.text()
+      console.log('Cloud save response:', text)
+      const data = JSON.parse(text)
+
+      if (!data.saved) throw new Error(data.error || 'Save failed')
+      alert('Session saved to cloud! View it at /dashboard')
     } catch (err) {
       console.error('Cloud save failed:', err)
       alert('Cloud save failed — please try again')

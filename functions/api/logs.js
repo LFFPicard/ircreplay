@@ -51,18 +51,26 @@ async function handleList(userId, env) {
 }
 
 async function handleGetDownloadUrl(userId, sessionId, env) {
-  const key = `${userId}/${sessionId}.json`
-  const url = await env.IRCREPLAY_R2.createSignedUrl(key, {
-    expiresIn: 3600,
-    httpMethod: 'GET',
+  const key    = `${userId}/${sessionId}.json`
+  const object = await env.IRCREPLAY_R2.get(key)
+
+  if (!object) {
+    return new Response(
+      JSON.stringify({ error: 'Session not found' }),
+      { status: 404, headers: HEADERS }
+    )
+  }
+
+  const text = await object.text()
+  return new Response(text, {
+    status:  200,
+    headers: { ...HEADERS, 'Content-Type': 'application/json' },
   })
-  return new Response(JSON.stringify({ url }), { status: 200, headers: HEADERS })
 }
 
-async function handleGetUploadUrl(userId, body, env) {
+async function handleUpload(userId, request, env) {
   const kv = env.IRCREPLAY_KV
 
-  // Check premium
   const premium = await isPremium(kv, userId)
   if (!premium) {
     return new Response(
@@ -71,11 +79,10 @@ async function handleGetUploadUrl(userId, body, env) {
     )
   }
 
-  // Check session limit — 50 for regular Pro, unlimited for lifetime
   const sessions = await getSessions(kv, userId)
   const userRaw  = await kv.get(`user:${userId}`)
   const user     = userRaw ? JSON.parse(userRaw) : {}
-  const limit    = user.isLifetime ? Infinity : 50
+  const limit    = user.isLifetime ? 999999 : 50
 
   if (sessions.length >= limit) {
     return new Response(
@@ -84,30 +91,46 @@ async function handleGetUploadUrl(userId, body, env) {
     )
   }
 
-  const { channel, date, size } = body
+  // Read the JSON body
+  const body = await request.text()
+
+  let sessionMeta
+  try {
+    const parsed = JSON.parse(body)
+    sessionMeta = {
+      channel: parsed.channel || 'Unknown',
+      date:    parsed.date    || null,
+      size:    body.length,
+    }
+  } catch {
+    return new Response(
+      JSON.stringify({ error: 'Invalid session JSON' }),
+      { status: 400, headers: HEADERS }
+    )
+  }
+
   const sessionId = crypto.randomUUID()
   const key       = `${userId}/${sessionId}.json`
 
-  // Generate presigned PUT URL — client uploads directly to R2
-  const url = await env.IRCREPLAY_R2.createSignedUrl(key, {
-    expiresIn: 300,
-    httpMethod: 'PUT',
+  // Write directly to R2
+  await env.IRCREPLAY_R2.put(key, body, {
+    httpMetadata: { contentType: 'application/json' },
   })
 
-  // Record session metadata in KV
+  // Record metadata in KV
   const newSession = {
     id:      sessionId,
-    channel: channel || 'Unknown',
-    date:    date    || null,
+    channel: sessionMeta.channel,
+    date:    sessionMeta.date,
     savedAt: new Date().toISOString(),
-    size:    size    || 0,
+    size:    sessionMeta.size,
   }
 
   sessions.push(newSession)
   await saveSessions(kv, userId, sessions)
 
   return new Response(
-    JSON.stringify({ url, sessionId }),
+    JSON.stringify({ sessionId, saved: true }),
     { status: 200, headers: HEADERS }
   )
 }
@@ -148,14 +171,7 @@ export async function onRequestPost(context) {
   const userId = getUserId(request)
   if (!userId) return new Response(JSON.stringify({ error: 'Unauthorised' }), { status: 401, headers: HEADERS })
 
-  let body
-  try {
-    body = await request.json()
-  } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: HEADERS })
-  }
-
-  return handleGetUploadUrl(userId, body, env)
+  return handleUpload(userId, request, env)
 }
 
 export async function onRequestDelete(context) {
