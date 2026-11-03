@@ -19,7 +19,6 @@ Premium tier is feature-complete in sandbox. Auth, KV, billing, R2 cloud storage
 - **KV:** Cloudflare KV — namespace `IRCREPLAY_KV`, bound in CF Pages settings
 - **R2:** Cloudflare R2 — bucket `ircreplay-logs`, bound as `IRCREPLAY_R2`
 - **Billing:** Paddle (sandbox) — overlay checkout via Paddle.js, webhook handler live
-- **Email:** Resend — waitlist signups via `/api/waitlist` function
 - **Repo:** github.com/LFFPicard/ircreplay (public)
 - **Domain:** ircreplay.app
 
@@ -31,8 +30,7 @@ Premium tier is feature-complete in sandbox. Auth, KV, billing, R2 cloud storage
 | Variable | Used in | Notes |
 |---|---|---|
 | `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk dev key — swap for prod key at launch |
-| `RESEND_API_KEY` | CF Function | Resend API key for waitlist |
-| `RESEND_SEGMENT_ID` | CF Function | Resend segment ID for waitlist |
+| `RESEND_API_KEY` | CF Function | Resend API key — currently unused, kept for the planned subscription confirmation emails |
 | `VITE_PADDLE_CLIENT_TOKEN` | Frontend | Paddle.js client token — starts with `test_` in sandbox |
 | `VITE_PADDLE_PRICE_MONTHLY` | Frontend | Price ID `pri_01krp43ygghhsdtbhr2964yqv3` |
 | `VITE_PADDLE_PRICE_ANNUAL` | Frontend | Price ID `pri_01krp47c4gm27t2py6adrj2nag` |
@@ -344,9 +342,6 @@ node_modules
 dist
 ```
 
-### Resend Global Contact Model
-As of Nov 2025 Resend uses global contacts — no audience IDs. Contacts are segmented via Segments. Waitlist flow: create contact → add to segment by segment ID. Two API calls.
-
 ### Git on Windows
 Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not errors, safe to ignore.
 
@@ -364,7 +359,7 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 - Export — HTML stats page, PDF via print dialog
 - Session JSON save/load (local)
 - Demo log (one-click load on drop zone)
-- About, Help/FAQ, Links, Pricing, Pro Coming Soon pages
+- About, Help/FAQ, Links, Pricing pages
 - Footer with Ko-fi and PayPal donation links
 
 ### SEO and Marketing — Complete
@@ -379,7 +374,6 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 ### Premium Infrastructure — Complete
 - Clerk auth — sign in live, sign ups restricted, Google SSO working
 - Cloudflare KV — user records created on sign in
-- /api/waitlist CF Function — Resend email capture live
 - /api/user CF Function — KV user record create/fetch live
 - Paddle sandbox — products created (monthly, annual, LTD)
 - Paddle.js overlay checkout — working end to end
