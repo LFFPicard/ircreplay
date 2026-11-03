@@ -40,6 +40,7 @@ Premium tier is feature-complete in sandbox. Auth, KV, billing, R2 cloud storage
 | `PADDLE_API_KEY` | CF Function | Paddle sandbox API key |
 | `PADDLE_WEBHOOK_SECRET` | CF Function | Full secret from Paddle notification destination — starts with `pdl_ntfset_` |
 | `PADDLE_PRICE_LTD` | CF Function | Same LTD price ID — used by webhook to identify LTD purchases |
+| `CLERK_SECRET_KEY` | CF Function | Clerk secret key (`sk_test_` dev / `sk_live_` prod) — used by `functions/_lib/auth.js` to verify session tokens. Missing = every authed API call returns 401. Swap for prod key at launch. Locally put it in `.dev.vars` for `wrangler pages dev` |
 
 ## Architecture
 
@@ -60,6 +61,18 @@ Premium tier is feature-complete in sandbox. Auth, KV, billing, R2 cloud storage
 - Paddle webhook flips `isPremium` flag in KV on subscription events
 - All premium features gate on `isPremium` from KV via UserContext
 - Share links served publicly via `/api/share/[userId]/[sessionId]` CF Function
+
+## API Auth — IMPORTANT
+- `/api/logs` and `/api/user` require `Authorization: Bearer <Clerk session token>`
+- Client gets the token from `useAuth().getToken()` (`@clerk/react`) and sends it on every call:
+  `headers: { Authorization: \`Bearer ${await getToken()}\` }`
+- Server verifies it in the shared helper `functions/_lib/auth.js` using `verifyToken` from `@clerk/backend` with `env.CLERK_SECRET_KEY`
+- `userId` comes ONLY from the verified token's `sub` claim — never from a header, query param or body
+- Returns 401 JSON if the header is missing, the token is invalid/expired, or `CLERK_SECRET_KEY` isn't set
+- Do NOT reintroduce an `X-User-Id` header — user IDs are public (they appear in share URLs), so trusting one lets anyone with a share link read/delete that user's sessions
+- `/api/share/[userId]/[sessionId]` stays public — no auth
+- `/api/logs` POST rejects bodies over 30 MB with 413 (checks `Content-Length` and real byte length via `TextEncoder`); session `size` metadata is stored in bytes
+- Paddle webhook never sets `isPremium: false` for users with `isLifetime: true`
 
 ## Key Directories
 ```
@@ -131,7 +144,6 @@ It starts with `pdl_ntfset_` and is much longer — includes a random signing ke
 5. Create new live webhook endpoint in Paddle pointing to same URL
 6. Switch Clerk from dev to production keys
 7. Uncomment Sign Up buttons in Nav.jsx
-8. Remove debug console.logs from paddle.js webhook handler
 
 ## R2 Cloud Storage — IMPORTANT
 
@@ -374,7 +386,6 @@ Line ending warnings (LF → CRLF) on `git add` are normal on Windows — not er
 ## Next Steps — Launch
 
 ### Pre-launch checklist
-- Remove debug console.logs from paddle.js webhook handler
 - Switch Paddle sandbox → live credentials (see Going live checklist above)
 - Switch Clerk dev → production keys
 - Uncomment Sign Up buttons in Nav.jsx

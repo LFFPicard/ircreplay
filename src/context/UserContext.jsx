@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/react'
 const UserContext = createContext()
 
 export function UserProvider({ children }) {
-  const { isSignedIn, userId } = useAuth()
+  const { isSignedIn, userId, getToken } = useAuth()
   const [userRecord,  setUserRecord ] = useState(null)
   const [isPremium,   setIsPremium  ] = useState(false)
   const [userLoading, setUserLoading] = useState(false)
@@ -20,7 +20,7 @@ export function UserProvider({ children }) {
       setUserLoading(true)
       try {
         const res = await fetch('/api/user', {
-          headers: { 'X-User-Id': userId },
+          headers: { Authorization: `Bearer ${await getToken()}` },
         })
         if (res.ok) {
           const data = await res.json()

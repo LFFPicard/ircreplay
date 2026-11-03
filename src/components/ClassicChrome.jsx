@@ -69,7 +69,7 @@ function ClassicChrome({ children }) {
   const { session }         = useSession()
   const { theme, setTheme } = useTheme()
   const { isPremium }       = useUser()
-  const { userId }          = useAuth()
+  const { userId, getToken } = useAuth()
   const navigate            = useNavigate()
   const location            = useLocation()
 
@@ -117,7 +117,7 @@ function ClassicChrome({ children }) {
       }
       const res  = await fetch('/api/logs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': userId },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
         body: JSON.stringify(exportData),
       })
       const data = await res.json()

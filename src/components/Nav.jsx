@@ -51,7 +51,7 @@ function Nav({ isMobile }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [exportMode, setExportMode] = useState('html')
   const [cloudSaving, setCloudSaving] = useState(false)
-  const { userId }    = useAuth()
+  const { userId, getToken } = useAuth()
   const { isPremium } = useUser()
 
   const canExport = session && stats
@@ -100,7 +100,7 @@ function Nav({ isMobile }) {
 
       const res  = await fetch('/api/logs', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': userId },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
         body:    json,
       })
 

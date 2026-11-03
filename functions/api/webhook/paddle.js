@@ -109,6 +109,8 @@ async function handleSubscriptionUpdated(data, kv) {
   if (!userId) return
   const activeStatuses = ['active', 'trialing', 'past_due']
   const isPremium      = activeStatuses.includes(data.status)
+  // Lifetime users keep premium regardless of any subscription's status
+  if (!isPremium && await isLifetimeUser(kv, userId)) return
   await setPremium(kv, userId, isPremium)
 }
 
@@ -116,7 +118,14 @@ async function handleSubscriptionCancelled(data, kv) {
   const customData = data.custom_data || data.customData || {}
   const userId     = customData.clerk_user_id || customData.clerkUserId
   if (!userId) return
+  // Lifetime users keep premium even if an old subscription is cancelled
+  if (await isLifetimeUser(kv, userId)) return
   await setPremium(kv, userId, false)
+}
+
+async function isLifetimeUser(kv, userId) {
+  const user = await getUser(kv, userId)
+  return user?.isLifetime === true
 }
 
 async function handleTransactionCompleted(data, kv, ltdPriceId) {

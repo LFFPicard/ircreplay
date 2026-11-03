@@ -8,13 +8,20 @@
 // GET  /api/logs?id=xxx   — get presigned download URL for a session
 // ─────────────────────────────────────────────
 
+import { authenticate, unauthorised } from '../_lib/auth.js'
+
 const HEADERS = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': 'https://ircreplay.app',
 }
 
-function getUserId(request) {
-  return request.headers.get('X-User-Id')
+const MAX_UPLOAD_BYTES = 30 * 1024 * 1024  // 30 MB
+
+function tooLarge() {
+  return new Response(
+    JSON.stringify({ error: 'Session too large', maxBytes: MAX_UPLOAD_BYTES }),
+    { status: 413, headers: HEADERS }
+  )
 }
 
 // ─────────────────────────────────────────────
@@ -91,8 +98,16 @@ async function handleUpload(userId, request, env) {
     )
   }
 
-  // Read the JSON body
-  const body = await request.text()
+  // Reject oversized uploads up front when Content-Length is declared
+  const declaredLength = parseInt(request.headers.get('Content-Length') || '', 10)
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_UPLOAD_BYTES) {
+    return tooLarge()
+  }
+
+  // Read the JSON body and check its real byte size
+  const body      = await request.text()
+  const byteSize  = new TextEncoder().encode(body).byteLength
+  if (byteSize > MAX_UPLOAD_BYTES) return tooLarge()
 
   let sessionMeta
   try {
@@ -100,7 +115,7 @@ async function handleUpload(userId, request, env) {
     sessionMeta = {
       channel: parsed.channel || 'Unknown',
       date:    parsed.date    || null,
-      size:    body.length,
+      size:    byteSize,
     }
   } catch {
     return new Response(
@@ -156,8 +171,9 @@ async function handleDelete(userId, sessionId, env) {
 
 export async function onRequestGet(context) {
   const { request, env } = context
-  const userId = getUserId(request)
-  if (!userId) return new Response(JSON.stringify({ error: 'Unauthorised' }), { status: 401, headers: HEADERS })
+  const auth = await authenticate(request, env)
+  if (auth.error) return unauthorised(auth.error, HEADERS)
+  const { userId } = auth
 
   const url        = new URL(request.url)
   const sessionId  = url.searchParams.get('id')
@@ -168,16 +184,18 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context
-  const userId = getUserId(request)
-  if (!userId) return new Response(JSON.stringify({ error: 'Unauthorised' }), { status: 401, headers: HEADERS })
+  const auth = await authenticate(request, env)
+  if (auth.error) return unauthorised(auth.error, HEADERS)
+  const { userId } = auth
 
   return handleUpload(userId, request, env)
 }
 
 export async function onRequestDelete(context) {
   const { request, env } = context
-  const userId = getUserId(request)
-  if (!userId) return new Response(JSON.stringify({ error: 'Unauthorised' }), { status: 401, headers: HEADERS })
+  const auth = await authenticate(request, env)
+  if (auth.error) return unauthorised(auth.error, HEADERS)
+  const { userId } = auth
 
   const url       = new URL(request.url)
   const sessionId = url.searchParams.get('id')
@@ -191,7 +209,7 @@ export async function onRequestOptions() {
     headers: {
       'Access-Control-Allow-Origin':  'https://ircreplay.app',
       'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   })
 }

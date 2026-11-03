@@ -18,7 +18,7 @@ function formatDate(iso) {
 }
 
 function Dashboard() {
-  const { userId }         = useAuth()
+  const { userId, getToken } = useAuth()
   const { setSession }     = useSession()
   const [sessions, setSessions] = useState([])
   const [loading,  setLoading ] = useState(true)
@@ -37,7 +37,7 @@ function Dashboard() {
     setLoading(true)
     setError(null)
     try {
-      const res  = await fetch('/api/logs', { headers: { 'X-User-Id': userId } })
+      const res  = await fetch('/api/logs', { headers: { Authorization: `Bearer ${await getToken()}` } })
       const data = await res.json()
       setSessions(data.sessions || [])
     } catch {
@@ -51,7 +51,7 @@ function Dashboard() {
     setRestoring(session.id)
     try {
       const res = await fetch(`/api/logs?id=${session.id}`, {
-        headers: { 'X-User-Id': userId },
+        headers: { Authorization: `Bearer ${await getToken()}` },
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const jsonText = await res.text()
@@ -73,7 +73,7 @@ function Dashboard() {
     try {
       await fetch(`/api/logs?id=${session.id}`, {
         method:  'DELETE',
-        headers: { 'X-User-Id': userId },
+        headers: { Authorization: `Bearer ${await getToken()}` },
       })
       setSessions(prev => prev.filter(s => s.id !== session.id))
     } catch {

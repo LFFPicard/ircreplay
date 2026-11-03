@@ -1,3 +1,5 @@
+import { authenticate, unauthorised } from '../_lib/auth.js'
+
 export async function onRequestGet(context) {
   const { env, request } = context
 
@@ -7,16 +9,10 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // Get Clerk user ID from the request header
-    // The frontend will send it as X-User-Id
-    const userId = request.headers.get('X-User-Id')
-
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: 'No user ID provided' }),
-        { status: 401, headers }
-      )
-    }
+    // Verify the Clerk session token — userId comes from the token's sub claim
+    const auth = await authenticate(request, env)
+    if (auth.error) return unauthorised(auth.error, headers)
+    const { userId } = auth
 
     // Look up user record in KV
     const record = await env.IRCREPLAY_KV.get(`user:${userId}`)
@@ -49,7 +45,7 @@ export async function onRequestOptions() {
     headers: {
       'Access-Control-Allow-Origin': 'https://ircreplay.app',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   })
 }
