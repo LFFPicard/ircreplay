@@ -72,12 +72,12 @@ Premium tier is feature-complete in sandbox. Auth, KV, billing, R2 cloud storage
 - Do NOT reintroduce an `X-User-Id` header — user IDs are public (they appear in share URLs), so trusting one lets anyone with a share link read/delete that user's sessions
 - `/api/share/[userId]/[sessionId]` stays public — no auth
 - `/api/logs` POST rejects bodies over 30 MB with 413 (checks `Content-Length` and real byte length via `TextEncoder`); session `size` metadata is stored in bytes
-- Paddle webhook never sets `isPremium: false` for users with `isLifetime: true`
+- Paddle webhook never sets `isPremium: false` for users with `isLifetime: true` — the only exception is a full refund of the LTD transaction (see Refunds below)
 
 ## Key Directories
 ```
 src/
-├── pages/          # Viewer, Stats, About, Help, Links, ComingSoon,
+├── pages/          # Viewer, Stats, About, Help, Links, Terms, Privacy, Refunds,
 │                   # Pricing, Dashboard, ShareView
 ├── components/     # Nav, ChatPane, NamesPanel, ChatLine, DropZone,
 │                   # Footer, PlaybackControls, ClassicChrome
@@ -87,8 +87,9 @@ src/
 └── context/        # SessionContext, ThemeContext, UserContext
 
 functions/
+├── _lib/
+│   └── auth.js                 # Shared Clerk bearer-token verification
 └── api/
-    ├── waitlist.js             # Resend email capture — LIVE
     ├── user.js                 # KV user record create/fetch — LIVE
     ├── logs.js                 # R2 cloud storage CRUD — LIVE
     ├── share/
@@ -130,6 +131,30 @@ Paddle uses British spelling in some events:
 - `subscription.cancelled` (double l) — British
 - `subscription.canceled` (single l) — American
 - Always handle both in the router
+
+### Webhook events — subscribe to ALL of these in the Paddle notification destination
+| Event | Effect |
+|---|---|
+| `subscription.created` | `isPremium: true` |
+| `subscription.updated` | `active` / `trialing` / `past_due` → `isPremium: true`; `canceled` / `paused` → `isPremium: false` (unless `isLifetime`); other statuses → no change |
+| `subscription.canceled` | `isPremium: false` unless `isLifetime` |
+| `subscription.past_due` | Keeps access — Paddle retries payment (routed to the updated handler) |
+| `subscription.paused` | `isPremium: false` unless `isLifetime` — NEW, must be added in Paddle |
+| `transaction.completed` | LTD price → `isPremium: true, isLifetime: true` |
+| `adjustment.created` | Refunds — see below — NEW, must be added in Paddle |
+| `adjustment.updated` | Refunds — approval usually arrives here — NEW, must be added in Paddle |
+
+### Refunds (adjustment events)
+- Paddle Billing sends refunds as adjustments, not transaction events
+- Handler acts ONLY when `action === 'refund'`, `status === 'approved'` and `type === 'full'`. Partial refunds, credits, chargebacks and `pending_approval` are ignored
+- Refunds usually arrive as `adjustment.created` (`pending_approval`) then `adjustment.updated` (`approved`) — both are routed, only the approved one acts
+- Adjustments do NOT carry `custom_data`. The handler fetches `GET /transactions/{transaction_id}` with `Authorization: Bearer ${env.PADDLE_API_KEY}` and reads `clerk_user_id` / `clerkUserId` from the transaction's `custom_data`
+- API base URL is picked from the key prefix: `pdl_sdbx_apikey_…` → `https://sandbox-api.paddle.com`, otherwise `https://api.paddle.com`. Sandbox keys are rejected by the live API
+- Refunded transaction contains the LTD price (`PADDLE_PRICE_LTD`) → `isLifetime: false, isPremium: false`
+- Any other refunded transaction → `isPremium: false`, unless the user `isLifetime`
+- Access is revoked only — R2 sessions and the KV session list are NOT deleted
+- Fails safe: missing API key, failed lookup, no user ID or no KV record → logs `console.error`, returns 200, changes nothing
+- A refund does not cancel the subscription in Paddle by itself — cancel it in Paddle too, or a later `subscription.updated` (active) will grant access again
 
 ### Webhook secret
 The webhook secret is NOT the notification ID (`ntfset_xxx`).

@@ -71,13 +71,15 @@ function Dashboard() {
     if (!window.confirm(`Delete "${session.channel}" saved on ${formatDate(session.savedAt)}?`)) return
     setDeleting(session.id)
     try {
-      await fetch(`/api/logs?id=${session.id}`, {
+      const res = await fetch(`/api/logs?id=${session.id}`, {
         method:  'DELETE',
         headers: { Authorization: `Bearer ${await getToken()}` },
       })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
       setSessions(prev => prev.filter(s => s.id !== session.id))
-    } catch {
-      setError('Failed to delete session')
+    } catch (err) {
+      console.error('Delete failed:', err)
+      alert('Failed to delete session — please try again')
     } finally {
       setDeleting(null)
     }
